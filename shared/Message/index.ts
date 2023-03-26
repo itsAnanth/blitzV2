@@ -1,4 +1,5 @@
-import Message from "./Message";
+import { Message, ping, pong } from "./Message";
+import MessageTypes from "./MessageTypes";
 
 export default Message;
-export { Message };
+export { Message, ping, pong, MessageTypes };

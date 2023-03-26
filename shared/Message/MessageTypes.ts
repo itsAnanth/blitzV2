@@ -5,7 +5,9 @@ enum MessageTypes {
     DISCONNECT,
     MESSAGE_CREATE,
     MESSAGE_DELETE,
-    MESSAGE_EDIT
+    MESSAGE_EDIT,
+    PING,
+    PONG
 };
 
 export default MessageTypes
