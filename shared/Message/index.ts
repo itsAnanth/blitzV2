@@ -3,3 +3,4 @@ import MessageTypes from "./MessageTypes";
 
 export default Message;
 export { Message, ping, pong, MessageTypes };
+export type { DataTypes } from './DataTypes';

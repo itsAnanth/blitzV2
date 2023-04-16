@@ -22,7 +22,15 @@ class Message<DataType extends Array<any> = any[]> {
         return encode(this.deflate());
     }
 
-    decode(message: ArrayBuffer | DataView): Message | null {
+    static deflate(message: Message): DeflatedMessage {
+        return [message.type, ...(message.data || [])];
+    }
+
+    static encode(message: Message) {
+        return encode(Message.deflate(message));
+    }
+
+    static decode(message: ArrayBuffer | DataView): Message | null {
         let data = new Uint8Array(message instanceof DataView ? message.buffer : message);
         let decodedMessage = decode(data);
 
