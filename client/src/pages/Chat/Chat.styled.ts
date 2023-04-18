@@ -23,32 +23,32 @@ export const ChatHeader = styled.div`
     width: 100%;
     flex: 25%;
     max-height: 80px;
-    background-color: ${({ theme }) => theme.secondary};
+    background-color: ${({ theme }) => theme.primary};
 `;
 
 export const ChatContent = styled.div`
     flex: 75%;
     width: 100%;
     display: flex;
-    background-color: lightgreen;
+    overflow: hidden;
+    /* background-color: lightgreen; */
 
 `;
 
 export const ChatSidebar = styled.div`
     flex: 20%;
-    background-color: lightblue;
+    background-color: ${({ theme }) => theme.tertiary};
 `
 
 export const ChatMain = styled.div`
     flex: 80%;
-    background-color: lightpink;
     display: flex;
     flex-direction: column;
 `;
 
 export const ChatMainContent = styled.div`
     position: relative;
-    background-color: ${({ theme }) => theme.primary};
+    background-color: ${({ theme }) => theme.bg};
     width: 100%;
     height: 100%;
     flex: 80%;
@@ -61,14 +61,13 @@ export const ChatMessage = styled.div`
     width: 100%;
     max-width: 100%;
     user-select: none;
-    /* background-color: green; */
     flex-direction: row;
     align-items: flex-start;
 
     transition: background-color 0.3;
 
     :hover {
-        background-color: ${({ theme }) => theme.secondary50};
+        background-color: ${({ theme }) => theme.tertiary50};
 
     }
 `;
@@ -113,7 +112,7 @@ export const MetaTimestamp = styled.div`
 
 export const ChatMessageContent = styled.div`
     /* background-color: blue; */
-    color: ${({ theme }) => theme.secondary};
+    color: ${({ theme }) => theme.text};
     padding: 1rem 0;
     padding-right: 1rem;
     word-break: break-word;
@@ -129,11 +128,14 @@ export const ChatMessageContent = styled.div`
 `;
 
 export const ChatMainForm = styled.div`
-    position: relative;
-    bottom: 0;
+    /* position: relative; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* bottom: 0; */
     width: 100%;
     max-height: 70px;
-    background-color: aliceblue;
+    background-color: ${({ theme }) => theme.secondary};
     flex: 20%;
 
     form {
@@ -146,17 +148,21 @@ export const ChatMainForm = styled.div`
     textarea {
         resize: none;
         border: none;
-        height: 80%;
-        flex: 70%;
+        height: 50%;
+        width: 90%;
         outline: none;
-        word-break: break-word;
-                white-space: pre-line;
-                overflow-wrap: break-word;
-                -ms-word-break: break-word;
-                word-break: break-word;
-                -ms-hyphens: auto;
-                -moz-hyphens: auto;
-                -webkit-hyphens: auto;
-                hyphens: auto;
+        border-radius: 10px;
+        line-height: 35px;
+        padding: 0 1rem;
+
     }
 `;
+
+export const ChatMainFormSend = styled.div`
+    height: 100%;
+    font-size: 2rem;
+    color: ${({ theme }) => theme.bg};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`

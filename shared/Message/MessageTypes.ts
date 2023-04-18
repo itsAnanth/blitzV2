@@ -7,7 +7,9 @@ enum MessageTypes {
     MESSAGE_DELETE,
     MESSAGE_EDIT,
     PING,
-    PONG
+    PONG,
+    JOIN_CHANNEL,
+    LEAVE_CHANNEL
 };
 
 export default MessageTypes

@@ -1,24 +1,26 @@
-import { useState, useEffect } from 'react'
 import WsManager from './structures/WsManager';
-import { Landing } from './components';
 import { GlobalStyles } from './Global.styled';
 import firebase from "./structures/Firebase";
 import { Routes, Route } from 'react-router-dom';
-import { Chat } from './pages';
+import { Chat, Test } from './pages';
 import { ThemeProvider } from 'styled-components';
-import { bwThemeDark } from './data/Theme';
+import { blueThemeLight } from './data/Theme';
+import { useContext } from 'react';
+import { WebSocketContext } from './contexts/websocket.context';
 
 
 function App() {
 	firebase();
-	const wsm = new WsManager();
+	const wsm = useContext(WebSocketContext);
 
+	wsm.connect();
 	// wsm.connect()
 
 	return (
-		<ThemeProvider theme={bwThemeDark}>
+		<ThemeProvider theme={blueThemeLight}>
 			<GlobalStyles />
 			<Routes>
+				<Route path='/' element={<Test />} />
 				<Route path='/chat' element={<Chat />} />
 			</Routes>
 		</ThemeProvider>

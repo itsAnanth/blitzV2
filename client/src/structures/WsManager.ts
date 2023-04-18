@@ -39,8 +39,6 @@ class WsManager extends EventTarget {
 
         this.ws = new WebSocket(`${protocol}://${hostname}`);
 
-        console.log('a');
-
         this.ws.binaryType = 'arraybuffer';
         this.ws.addEventListener('open', this.onOpen.bind(this));
         this.ws.addEventListener('error', this.onError.bind(this));

@@ -6,6 +6,12 @@ const httpServer = new HttpServer(3000);
 
 Logger.DEV = true;
 
+declare module 'websocket' {
+    interface connection {
+        id: string;
+    }
+}
+
 (async function () {
     await httpServer.init();
     await httpServer.start();

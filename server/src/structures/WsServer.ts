@@ -7,6 +7,7 @@ import User from "./User/User";
 import { Logger } from "../utils";
 
 import colors from 'colors/safe';
+import Room from "./Room/Room";
 
 class WsServer extends server {
 
@@ -16,7 +17,7 @@ class WsServer extends server {
     // collection of all collected users
     // map { userId: User object }
     users: Map<string, User>;
-    rooms: Map<string, any>;
+    channels: Map<string, Room>;
 
     constructor(httpServer: ReturnType<typeof createServer>) {
         if (!httpServer) throw new Error('No http server found');
@@ -24,7 +25,7 @@ class WsServer extends server {
 
         this.events = new Map();
         this.users = new Map();
-        this.rooms = new Map();
+        this.channels = new Map();
     }
 
     async init() {
@@ -49,21 +50,10 @@ class WsServer extends server {
 
     }
 
-    broadcastRoom(roomId: string, message: Message | Buffer) {
-        const room = this.rooms.get(roomId);
-
-        if (!room || room.users.size === 0) return;
-
-        for (const user of [...room.users.values()]) {
-            const encoded = message instanceof Message ? message.encode() : message;
-            user.connection.send(encoded);
-        }
-    }
 
     start() {
         // client connected
         this.on('connect', (_connection) => {
-            // one doutb
             // add new user to users map
 
             // const user = new User({ connection });
