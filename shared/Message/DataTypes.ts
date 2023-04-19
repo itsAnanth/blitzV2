@@ -1,7 +1,8 @@
+
 export namespace DataTypes {
     export namespace Server {
         export type CONNECT = [{ success: boolean, username?: string }];
-
+        export type MESSAGE_CREATE = [{ content: string, recipient: string, authorId: string, messageId: string }];
 
 
 

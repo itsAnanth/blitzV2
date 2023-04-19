@@ -1,8 +1,32 @@
 import { ChatContainer, ChatContent, ChatDiv, ChatHeader, ChatMain, ChatMainContent, ChatMainForm, ChatMainFormSend, ChatSidebar } from "./Chat.styled";
 import { ChatMessage } from "../../components";
 import { AiOutlineSend } from 'react-icons/ai';
+import { useContext, useState } from "react";
+import { WebSocketContext } from "../../contexts/websocket.context";
+import Message, { DataTypes } from "../../../../shared/Message";
+import { isCustomEvent } from "../../utils";
 
 function Chat() {
+
+    type messageType = DataTypes.Server.MESSAGE_CREATE[0];
+    const [message, setMessage] = useState<messageType[]>([]);
+    const wsm = useContext(WebSocketContext);
+
+    wsm.addEventListener(Message.types[Message.types.MESSAGE_CREATE], ev => {
+        if (!isCustomEvent(ev)) return;
+
+        const data: DataTypes.Server.MESSAGE_CREATE = ev.detail;
+
+        setMessage([...message, data[0]]);
+    });
+
+    const messages = message.map((item, i) => (
+        <ChatMessage
+            author={item.authorId}
+            content={item.content}
+            timestamp={new Date(Date.now()).toLocaleDateString()}
+        />
+    ))
     return (
         <ChatDiv>
             <ChatContainer>
@@ -11,12 +35,7 @@ function Chat() {
                     <ChatSidebar></ChatSidebar>
                     <ChatMain>
                         <ChatMainContent>
-                            <ChatMessage author='author' timestamp={new Date(Date.now()).toLocaleDateString()} content="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum." />
-                            <ChatMessage author='author' timestamp={new Date(Date.now()).toLocaleDateString()} content="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum." />
-                            <ChatMessage author='author' timestamp={new Date(Date.now()).toLocaleDateString()} content="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum." />
-                            <ChatMessage author='author' timestamp={new Date(Date.now()).toLocaleDateString()} content="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum." />
-                            <ChatMessage author='author' timestamp={new Date(Date.now()).toLocaleDateString()} content="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum." />
-
+                            {messages}
                         </ChatMainContent>
                         <ChatMainForm>
                             <form>

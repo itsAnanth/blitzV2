@@ -13,7 +13,6 @@ function App() {
 	firebase();
 	const wsm = useContext(WebSocketContext);
 
-	wsm.connect();
 	// wsm.connect()
 
 	return (
