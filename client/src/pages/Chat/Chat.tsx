@@ -24,6 +24,12 @@ function Chat() {
             .then(val => setChannels(val));
     }, [])
 
+    useEffect(() => {
+
+        console.log(auth.currentUser);
+        if (!auth.currentUser) navigate('/signup')
+    })
+
 
 
 
@@ -138,7 +144,7 @@ function Chat() {
                         </ChatContent>
                     </ChatContainer>
                 </ChatDiv>
-                : navigate('/signup')}
+                : <></>}
         </>
     )
 }

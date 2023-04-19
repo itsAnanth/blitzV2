@@ -83,3 +83,16 @@ export const ErrorOverlay = styled.div`
     color: red;
     font-size: 1.2rem;
 `;
+
+export const LandingFooter = styled.div`
+    background-color: ${({ theme }) => theme.primary};
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 50px;
+    color: ${({ theme }) => theme.bg};
+    font-weight: 400;
+
+`

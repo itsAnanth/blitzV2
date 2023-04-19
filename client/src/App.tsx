@@ -1,6 +1,5 @@
-import WsManager from './structures/WsManager';
 import { GlobalStyles } from './Global.styled';
-import firebase from "./structures/Firebase";
+import firebaseInit from "./structures/Firebase";
 import { Routes, Route } from 'react-router-dom';
 import { Chat, Landing, Test } from './pages';
 import { ThemeProvider } from 'styled-components';
@@ -9,10 +8,14 @@ import { useContext } from 'react';
 import { WebSocketContext } from './contexts/websocket.context';
 import { LandingTypes } from './utils/LandingTypes';
 import { Logger } from './utils';
+import { getAuth, inMemoryPersistence } from 'firebase/auth';
 
 
 function App() {
-	firebase();
+	firebaseInit();
+
+	getAuth().setPersistence(inMemoryPersistence)
+	
 	Logger.DEV = true;
 	const wsm = useContext(WebSocketContext);
 
