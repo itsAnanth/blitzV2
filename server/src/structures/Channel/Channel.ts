@@ -5,10 +5,12 @@ class Channel {
 
     members: string[];
     id: string;
+    name: string;
 
-    constructor({ id }: { id: string }) {
+    constructor({ id, name }: { name: string, id: string }) {
         this.id = id;
         this.members = [];
+        this.name = name;
     }
 
     addUser(userId: string) {
@@ -29,6 +31,13 @@ class Channel {
 
             user.socket.send(message.encode());
 
+        }
+    }
+
+    serialize() {
+        return {
+            name: this.name,
+            id: this.id
         }
     }
 }

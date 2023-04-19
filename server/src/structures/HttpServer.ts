@@ -7,9 +7,11 @@ import { createServer } from 'http';
 import { httpTypeArray } from '../../../shared/HTTP/HttpTypes';
 import Logger from '../utils/Logger';
 import cors from 'cors';
+import WsServer from './WsServer';
 
 class HttpServer {
     app: Express;
+    WsServer: WsServer;
     // { GET: { 'routepath': Event } }
     events: Map<HttpTypes, Map<string, HttpEvent>>
     server: ReturnType<typeof createServer>;
@@ -18,6 +20,7 @@ class HttpServer {
     constructor(PORT: number = 3000) {
         this.PORT = PORT;
         this.events = new Map();
+        this.WsServer = null;
 
         for (let i = 0; i < httpTypeArray.length; i++)
             this.events.set(i, new Map())
@@ -42,8 +45,14 @@ class HttpServer {
         Logger.log(`[HTTP_SERVER]`, this.events)
     }
 
+    setWsServer(server: WsServer) {
+        this.WsServer = server;
+    }
+
     start() {
         this.app = express();
+
+        this.app.use(cors())
 
         for (const [method, event] of this.events.entries()) {
             for (const [route, eventHandler] of event.entries()) {

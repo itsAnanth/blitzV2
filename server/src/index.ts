@@ -1,9 +1,10 @@
+import Channel from "./structures/Channel/Channel";
 import HttpServer from "./structures/HttpServer";
 import WsServer from "./structures/WsServer";
+import { getChannelId } from "./utils";
 import Logger from "./utils/Logger";
 
 const httpServer = new HttpServer(3000);
-
 Logger.DEV = true;
 
 declare module 'websocket' {
@@ -14,11 +15,18 @@ declare module 'websocket' {
 
 (async function () {
     await httpServer.init();
-    await httpServer.start();
+    httpServer.start();
 
     const wsServer = new WsServer(httpServer.server);
 
 
     await wsServer.init();
-    await wsServer.start();
-})()
+
+    for (let i = 0; i < 5; i++) {
+        let temp = new Channel({ id: getChannelId(), name: 'general' });
+        wsServer.channels.set(temp.id, temp);
+    }
+    wsServer.start();
+
+    httpServer.setWsServer(wsServer);
+})();

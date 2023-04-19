@@ -18,6 +18,6 @@ export default new WsEvent<DataTypes.Client.USER_JOIN>({
 
         this.users.set(ws.id, user);
 
-        console.log('current users', this.users);
+        console.log('current users', [...this.users.keys()]);
     },
 })

@@ -7,7 +7,7 @@ import User from "./User/User";
 import { Logger } from "../utils";
 
 import colors from 'colors/safe';
-import Room from "./Room/Room";
+import Room from "./Channel/Channel";
 
 class WsServer extends server {
 

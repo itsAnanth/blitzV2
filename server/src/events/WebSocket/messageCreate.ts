@@ -17,7 +17,7 @@ export default new WsEvent<DataTypes.Client.MESSAGE_CREATE>({
 
         room.broadCast(this.users, new Message({
             type: Message.types.MESSAGE_CREATE,
-            data: [{ ...(_message.data[0]), messageId: getMessageId(), authorId: user.id }]
+            data: [{ ...(_message.data[0]), messageId: getMessageId(), authorId: user.id, authorUsername: user.username }]
         }));
     },
 })

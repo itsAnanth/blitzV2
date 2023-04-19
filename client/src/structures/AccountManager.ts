@@ -29,7 +29,7 @@ class AccountManager {
         try {
             result = await createUserWithEmailAndPassword(auth, email, password);
 
-            if (!auth.currentUser) return console.error('no user in signup');
+            if (!auth.currentUser) return { error: true, detail: 'error' };
             await updateProfile(auth.currentUser, { displayName: username });
         } catch (e) {
             console.log('Auth signup error');

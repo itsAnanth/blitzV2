@@ -38,6 +38,51 @@ export const ChatContent = styled.div`
 export const ChatSidebar = styled.div`
     flex: 20%;
     background-color: ${({ theme }) => theme.tertiary};
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    scrollbar-gutter: stable both-edges;
+
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
+    :hover {
+        ::-webkit-scrollbar {
+            display: block;
+        }
+    }
+
+`;
+
+export const ChatSidebarContent = styled.div`
+    display: flex;
+    width: 95%;
+    justify-content: center;
+    align-items: center;
+    /* width: 80%; */
+    height: 100%;
+
+    :hover {
+        background-color: ${({ theme }) => theme.secondary};
+    }
+`
+
+export const ChatSidebarContainer = styled.div`
+    /* background-color: red; */
+    width: 100%;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80px;
+    margin: 5px 0;
+
+  
+
+    .active {
+        background-color: ${({ theme }) => theme.primary};
+    }
 `
 
 export const ChatMain = styled.div`
@@ -158,7 +203,10 @@ export const ChatMainForm = styled.div`
     }
 `;
 
-export const ChatMainFormSend = styled.div`
+export const ChatMainFormSend = styled.button`
+    outline: none;
+    border: none;
+    background-color: transparent;
     height: 100%;
     font-size: 2rem;
     color: ${({ theme }) => theme.bg};

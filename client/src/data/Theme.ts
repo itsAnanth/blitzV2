@@ -7,6 +7,7 @@ type Theme = {
     text: string;
     bg50: string;
     tertiary50: string;
+    secondary50: string;
 }
 
 
@@ -19,7 +20,8 @@ export const blueThemeLight: Theme = {
     bg: '#e6e9ff',
     text: '#000000',
     bg50: '#e6e9ff50',
-    tertiary50: '#7386ff50'
+    tertiary50: '#7386ff50',
+    secondary50: '#667aff50'
 
 }
 
