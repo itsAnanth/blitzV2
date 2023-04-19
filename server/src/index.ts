@@ -22,10 +22,12 @@ declare module 'websocket' {
 
     await wsServer.init();
 
-    for (let i = 0; i < 5; i++) {
-        let temp = new Channel({ id: getChannelId(), name: 'general' });
-        wsServer.channels.set(temp.id, temp);
-    }
+    wsServer.channels.set('123456', new Channel({ id: '123456', name: 'main' }));
+
+    // for (let i = 0; i < 5; i++) {
+    //     let temp = new Channel({ id: getChannelId(), name: 'general' });
+    //     wsServer.channels.set(temp.id, temp);
+    // }
     wsServer.start();
 
     httpServer.setWsServer(wsServer);

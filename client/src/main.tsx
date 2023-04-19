@@ -8,13 +8,11 @@ import WebSocketProvider from './contexts/websocket.context';
 
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-	<React.StrictMode>
-		<Provider store={store}>
-			<WebSocketProvider>
-				<BrowserRouter>
-					<App />
-				</BrowserRouter>
-			</WebSocketProvider>
-		</Provider>
-	</React.StrictMode>,
+	<Provider store={store}>
+		<WebSocketProvider>
+			<BrowserRouter>
+				<App />
+			</BrowserRouter>
+		</WebSocketProvider>
+	</Provider>
 )

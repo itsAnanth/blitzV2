@@ -18,6 +18,11 @@ export default new WsEvent<DataTypes.Client.USER_JOIN>({
 
         this.users.set(ws.id, user);
 
+        ws.send(new Message({
+            type: Message.types.USER_JOIN,
+            data: [{ status: 'authenticated'}]
+        }).encode())
+
         console.log('current users', [...this.users.keys()]);
     },
 })

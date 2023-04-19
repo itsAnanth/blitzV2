@@ -70,7 +70,9 @@ class WsManager extends EventTarget {
     private onOpen() {
         this._open = true;
         Logger.logc('blue', 'WS_OPEN', 'eslabished connection to ' + this.host);
-        this.wsHandshake();
+        // this.wsHandshake();
+
+        this.dispatchEvent(new CustomEvent('wsopen'));
     }
 
     private onClose() {

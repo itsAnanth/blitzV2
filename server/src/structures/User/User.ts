@@ -29,6 +29,15 @@ class ServerUser extends User {
         this.id = id;
         this.activeChannel = null;
     }
+
+
+    serialize() {
+        return {
+            username: this.username,
+            avatar: this.avatar,
+            id: this.id
+        }
+    }
 }
 
 export default ServerUser;

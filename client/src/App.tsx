@@ -8,10 +8,12 @@ import { blueThemeLight } from './data/Theme';
 import { useContext } from 'react';
 import { WebSocketContext } from './contexts/websocket.context';
 import { LandingTypes } from './utils/LandingTypes';
+import { Logger } from './utils';
 
 
 function App() {
 	firebase();
+	Logger.DEV = true;
 	const wsm = useContext(WebSocketContext);
 
 	// wsm.connect()
@@ -20,7 +22,7 @@ function App() {
 		<ThemeProvider theme={blueThemeLight}>
 			<GlobalStyles />
 			<Routes>
-				<Route path='/' element={<Test />} />
+				{/* <Route path='/' element={<Test />} /> */}
 				<Route path='/signup' element={<Landing type={LandingTypes.SIGNUP} />} />
 				<Route path='/signin' element={<Landing type={LandingTypes.SIGNIN} />} />
 				<Route path='/chat' element={<Chat />} />

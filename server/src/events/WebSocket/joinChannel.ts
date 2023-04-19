@@ -2,6 +2,7 @@ import Message, { DataTypes } from "../../../../shared/Message";
 import WsEvent from "../../structures/Events/WsEvent";
 import Channel from "../../structures/Channel/Channel";
 import ServerUser from "../../structures/User/User";
+import { getMessageId } from "../../utils";
 
 export default new WsEvent<DataTypes.Client.JOIN_CHANNEL>({
     messageType: Message.types.JOIN_CHANNEL,
@@ -21,14 +22,14 @@ export default new WsEvent<DataTypes.Client.JOIN_CHANNEL>({
             let usersChannel = this.channels.get(user.activeChannel);
             usersChannel.members.splice(usersChannel.members.indexOf(user.id), 1);
         }
-        
+
         user.activeChannel = channel.id;
 
         channel.addUser(ws.id);
 
-        channel.broadCast(this.users, new Message({
-            type: Message.types.JOIN_CHANNEL,
-            data: [ws.id]
+        channel.broadCast(this.users, new Message<DataTypes.Server.MESSAGE_CREATE>({
+            type: Message.types.MESSAGE_CREATE,
+            data: [{ content: `${user.username} has joined the chat!`, recipient: '', authorUsername: 'Blitz Bot', authorId: 'bot', 'messageId': getMessageId() }]
         }));
 
         

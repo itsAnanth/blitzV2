@@ -23,7 +23,19 @@ export const ChatHeader = styled.div`
     width: 100%;
     flex: 25%;
     max-height: 80px;
+    align-items: center;
+    flex-direction: row;
     background-color: ${({ theme }) => theme.primary};
+`;
+
+export const ChatHeaderBrand = styled.div`
+    flex: 20%;
+    display: flex;
+    align-items: center;
+    padding-left: 40px;
+    font-weight: 600;
+    font-size: 1.3rem;
+    color: ${({ theme }) => theme.bg};
 `;
 
 export const ChatContent = styled.div`
@@ -71,11 +83,10 @@ export const ChatSidebarContent = styled.div`
 export const ChatSidebarContainer = styled.div`
     /* background-color: red; */
     width: 100%;
-    height: 30px;
+    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 80px;
     margin: 5px 0;
 
   
@@ -147,6 +158,7 @@ export const MetaAuthor = styled.div`
     max-width: 50%;
     font-size: 1rem;
     margin-right: 1rem;
+    font-weight: 500;
 `
 
 export const MetaTimestamp = styled.div`
