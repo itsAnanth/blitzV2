@@ -26,6 +26,7 @@ a {
 ::-webkit-scrollbar-thumb {
 	border-radius: 10px;
 	transition: 0.3s;
+	background: red;
 }
 img {
 	-webkit-touch-callout: none;

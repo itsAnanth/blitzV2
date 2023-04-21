@@ -203,7 +203,7 @@ export const ChatMainForm = styled.div`
         justify-content: center;
         width: 100%;
     }
-    textarea {
+    input {
         resize: none;
         border: none;
         height: 50%;

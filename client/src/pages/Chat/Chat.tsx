@@ -13,13 +13,13 @@ function Chat() {
     const navigate = useNavigate();
     let user = authContext.user;
     const formContainerRef = useRef<HTMLDivElement>(null);
-    const textRef = useRef<HTMLTextAreaElement>(null);
+    const textRef = useRef<HTMLInputElement>(null);
+    const chatMainRef = useRef<HTMLDivElement>(null);
     type messageType = DataTypes.Server.MESSAGE_CREATE[0];
     const [message, setMessage] = useState<messageType[]>([]);
     const wsm = useContext(WebSocketContext);
     const [channels, setChannels] = useState<DataTypes.Server.GET_CHANNELS>([]);
     const [users, setUsers] = useState();
-    const [loaderActive, setLoaderActive] = useState(true);
 
     const [currentChannel, setCurrentChannel] = useState<string | null>(null);
     // useEffect(() => {
@@ -30,13 +30,13 @@ function Chat() {
 
     useEffect(() => {
 
-        // if (authContext.user === undefined) return console.log('state loading');
-        // console.log('received state');
-
-        // setLoaderActive(false);
         initChat();
 
     }, [message]);
+
+    useEffect(() => {
+        chatMainRef.current?.scrollTo({ 'top': chatMainRef.current.scrollHeight });
+    })
 
 
     function initChat() {
@@ -60,12 +60,11 @@ function Chat() {
 
         }
 
+
         wsm.addEventListener('wsopen', () => {
             user = authContext.user;
 
             console.log('ws open');
-
-            // if (!user) return navigate('/signup');
 
             wsm.send(new Message<DataTypes.Client.USER_JOIN>({
                 type: Message.types.USER_JOIN,
@@ -91,17 +90,9 @@ function Chat() {
 
 
             setMessage([...message, data[0]]);
+
         });
     }
-
-
-
-    useEffect(() => {
-        console.log('EFFECT', message);
-    }, [message])
-
-
-
 
 
     const sendMessage = (ev: React.FormEvent<HTMLFormElement>) => {
@@ -156,7 +147,7 @@ function Chat() {
                                     </ChatSidebarContainer>)}
                             </ChatSidebar>
                             <ChatMain>
-                                <ChatMainContent>
+                                <ChatMainContent ref={chatMainRef}>
                                     {message.map((item, i) => (
                                         <ChatMessage
                                             author={item.authorUsername}
@@ -169,7 +160,7 @@ function Chat() {
                                 <ChatMainForm ref={formContainerRef}>
 
                                     <form onSubmit={sendMessage}>
-                                        <textarea
+                                        <input
                                             ref={textRef}
                                             placeholder="Message"
                                             name="message"
