@@ -30,21 +30,14 @@ function Chat() {
 
     useEffect(() => {
 
-        if (authContext.user === undefined) return console.log('state loading');
-        console.log('received state');
+        // if (authContext.user === undefined) return console.log('state loading');
+        // console.log('received state');
 
-        setLoaderActive(false);
+        // setLoaderActive(false);
         initChat();
 
-        // wsm.addEventListener('LOGIN_STATE_CHANGE', () => {
-        //     console.log('received login state');
+    }, [message]);
 
-        //     initChat();
-        // })
-
-
-
-    }, [user]);
 
     function initChat() {
         if (!authContext.user) return navigate('/signup');
@@ -93,7 +86,9 @@ function Chat() {
         wsm.addEventListener(Message.types[Message.types.MESSAGE_CREATE], ev => {
             if (!isCustomEvent(ev)) return;
 
+
             const data: DataTypes.Server.MESSAGE_CREATE = ev.detail;
+
 
             setMessage([...message, data[0]]);
         });
@@ -101,6 +96,9 @@ function Chat() {
 
 
 
+    useEffect(() => {
+        console.log('EFFECT', message);
+    }, [message])
 
 
 
@@ -135,17 +133,9 @@ function Chat() {
         }))
     }
 
-    const messages = message.map((item, i) => (
-        <ChatMessage
-            author={item.authorUsername}
-            content={item.content}
-            timestamp={new Date(Date.now()).toLocaleDateString()}
-            key={i}
-        />
-    ))
     return (
         <>
-            <Loader active={loaderActive} />
+            {/* <Loader active={loaderActive} /> */}
             {user ?
                 <ChatDiv>
                     <ChatContainer>
@@ -167,7 +157,14 @@ function Chat() {
                             </ChatSidebar>
                             <ChatMain>
                                 <ChatMainContent>
-                                    {messages}
+                                    {message.map((item, i) => (
+                                        <ChatMessage
+                                            author={item.authorUsername}
+                                            content={item.content}
+                                            timestamp={new Date(Date.now()).toLocaleDateString()}
+                                            key={i}
+                                        />
+                                    ))}
                                 </ChatMainContent>
                                 <ChatMainForm ref={formContainerRef}>
 

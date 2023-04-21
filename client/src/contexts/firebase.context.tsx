@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import firebaseInit from '../structures/Firebase';
 import firebase from 'firebase/app';
-import { getAuth, inMemoryPersistence, User } from 'firebase/auth';
+import { browserLocalPersistence, getAuth, inMemoryPersistence, User } from 'firebase/auth';
 import { WebSocketContext } from './websocket.context';
 
 const FireBaseContext = createContext<{ app: firebase.FirebaseApp, user: User | null | undefined }>(null as any);
@@ -15,7 +15,7 @@ const FireBaseProvider = ({ children }: any) => {
     useEffect(() => {
         console.log(firebaseUser);
         const auth = getAuth(app);
-        auth.setPersistence(inMemoryPersistence)
+        auth.setPersistence(browserLocalPersistence)
         const unsub = auth.onAuthStateChanged((user) => {
             console.log('state change', user);
             setFirebaseUser(user);

@@ -10,11 +10,15 @@ import { LandingTypes } from './utils/LandingTypes';
 import { Logger } from './utils';
 import { browserLocalPersistence, getAuth, inMemoryPersistence } from 'firebase/auth';
 import FireBaseProvider from './contexts/firebase.context';
+import { useState } from 'react';
+import { AuthGuard } from './components';
 
 
 function App() {
 
 	// getAuth().setPersistence(browserLocalPersistence)
+
+	console.log(window.location.href);
 
 	Logger.DEV = true;
 
@@ -24,11 +28,12 @@ function App() {
 		<ThemeProvider theme={blueThemeLight}>
 			<FireBaseProvider>
 				<GlobalStyles />
+				<AuthGuard></AuthGuard>
 				<Routes>
-					{/* <Route path='/' element={<Test />} /> */}
 					<Route path='/signup' element={<Landing type={LandingTypes.SIGNUP} />} />
 					<Route path='/signin' element={<Landing type={LandingTypes.SIGNIN} />} />
 					<Route path='/chat' element={<Chat />} />
+
 				</Routes>
 			</FireBaseProvider>
 		</ThemeProvider>

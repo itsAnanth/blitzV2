@@ -4,11 +4,10 @@ import React, { useRef, useEffect } from 'react';
 
 function Loader({ active }: any) {
     const theme = useTheme();
-    const divRef = useRef<HTMLDivElement>(null);
 
 
     return (
-        <div ref={divRef} className={`loader ${active ? 'loader--active' : 'loader--inactive'}`} style={{ zIndex: 99999 }}>
+        <div className={`loader ${active ? 'loader--active' : 'loader--inactive'}`} style={{ zIndex: 99999 }}>
             <div className="loader__icon">
                 <svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xlinkHref="http://www.w3.org/1999/xlink" x="0px" y="0px"
                     width="80px" height="80px" viewBox="0 0 40 40" enableBackground="new 0 0 40 40" xmlSpace="preserve">
