@@ -191,9 +191,10 @@ export const ChatMainForm = styled.div`
     align-items: center;
     /* bottom: 0; */
     width: 100%;
-    max-height: 70px;
+    max-height: 50%;
+    min-height: 70px;
     background-color: ${({ theme }) => theme.secondary};
-    flex: 20%;
+    /* flex: 20%; */
 
     form {
         height: 100%;
@@ -225,4 +226,27 @@ export const ChatMainFormSend = styled.button`
     display: flex;
     align-items: center;
     justify-content: center;
+`;
+
+export const UsersContainer = styled.div`
+    width: 100%;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 5px 0;
+
+`
+
+export const User = styled.div`
+    display: flex;
+    width: 95%;
+    height: 100%;
+`;
+
+export const UserAvatar = styled.img`
+    max-width: 30px;
+    width: auto;
+    height: auto;
+    border-radius: 50%;
 `

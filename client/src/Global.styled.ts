@@ -1,6 +1,12 @@
 import { createGlobalStyle } from "styled-components"
 
 export const GlobalStyles = createGlobalStyle`
+
+:root {
+	--primary: black;
+	--secondary: white;
+
+}
 * {
 	font-family: 'Montserrat', sans-serif;
 	margin: 0;

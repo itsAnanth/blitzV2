@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import AccountManager from "../../structures/AccountManager";
 import { ErrorOverlay, InputContainer, LandingContainer, LandingContent, LandingDiv, LandingFooter, LandingHeader, LandingHeading, LandingInput, SubmitButton } from "./Landing.styled";
 import { useNavigate, Link } from 'react-router-dom';
 import { LandingTypes } from '../../utils/LandingTypes';
 import { getAuth } from 'firebase/auth';
+import { FireBaseContext } from '../../contexts/firebase.context';
 function Landing({ type }: any) {
 
-    const auth = getAuth();
+    const authContext = useContext(FireBaseContext);
     const [error, setError] = useState();
     const navigate = useNavigate();
     async function onSubmit(ev: any) {
@@ -29,12 +30,12 @@ function Landing({ type }: any) {
     }
 
     useEffect(() => {
-        console.log(auth.currentUser)
-        if (auth.currentUser) navigate('/chat')
+        console.log(authContext)
+        if (authContext.user) navigate('/chat')
     })
     return (
         <>
-            {auth.currentUser ? <></> :
+            {authContext.user ? <></> :
                 <LandingDiv>
                     <LandingContainer>
                         <LandingHeader>Blitz App</LandingHeader>
