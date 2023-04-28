@@ -5,7 +5,7 @@ import { useContext, useState, useEffect, useRef } from "react";
 import { WebSocketContext } from "../../contexts/websocket.context";
 import Message, { DataTypes } from "../../../../shared/Message";
 import { isCustomEvent } from "../../utils";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { FireBaseContext } from "../../contexts/firebase.context";
 
 function Chat() {
@@ -40,7 +40,7 @@ function Chat() {
 
 
     function initChat() {
-        if (!authContext.user) return navigate('/signup');
+        // if (!authContext.user) return navigate('/signup');
 
 
         // textRef.current?.addEventListener('input', () => {
@@ -173,7 +173,7 @@ function Chat() {
                         </ChatContent>
                     </ChatContainer>
                 </ChatDiv>
-                : <></>}
+                : <Navigate to={'/signup'} />}
         </>
     )
 }

@@ -1,9 +1,8 @@
 import { useState, useEffect, useContext } from 'react';
 import AccountManager from "../../structures/AccountManager";
 import { ErrorOverlay, InputContainer, LandingContainer, LandingContent, LandingDiv, LandingFooter, LandingHeader, LandingHeading, LandingInput, SubmitButton } from "./Landing.styled";
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { LandingTypes } from '../../utils/LandingTypes';
-import { getAuth } from 'firebase/auth';
 import { FireBaseContext } from '../../contexts/firebase.context';
 function Landing({ type }: any) {
 
@@ -30,12 +29,12 @@ function Landing({ type }: any) {
     }
 
     useEffect(() => {
-        console.log(authContext)
-        if (authContext.user) navigate('/chat')
-    })
+        console.log(authContext.user, 'landing state changed')
+        // if (authContext.user) navigate('/chat')
+    }, [authContext.user])
     return (
         <>
-            {authContext.user ? <></> :
+            {authContext.user ? <Navigate to={'/chat'} /> :
                 <LandingDiv>
                     <LandingContainer>
                         <LandingHeader>Blitz App</LandingHeader>

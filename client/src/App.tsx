@@ -28,13 +28,14 @@ function App() {
 		<ThemeProvider theme={blueThemeLight}>
 			<FireBaseProvider>
 				<GlobalStyles />
-				<AuthGuard></AuthGuard>
-				<Routes>
-					<Route path='/signup' element={<Landing type={LandingTypes.SIGNUP} />} />
-					<Route path='/signin' element={<Landing type={LandingTypes.SIGNIN} />} />
-					<Route path='/chat' element={<Chat />} />
+				<AuthGuard>
+					<Routes>
+						<Route path='/signup' element={<Landing type={LandingTypes.SIGNUP} />} />
+						<Route path='/signin' element={<Landing type={LandingTypes.SIGNIN} />} />
+						<Route path='/chat' element={<Chat />} />
 
-				</Routes>
+					</Routes>
+				</AuthGuard>
 			</FireBaseProvider>
 		</ThemeProvider>
 		// <>
