@@ -12,6 +12,7 @@ import { browserLocalPersistence, getAuth, inMemoryPersistence } from 'firebase/
 import FireBaseProvider from './contexts/firebase.context';
 import { useState } from 'react';
 import { AuthGuard } from './components';
+import LoaderProvider from './contexts/loader.context';
 
 
 function App() {
@@ -28,14 +29,14 @@ function App() {
 		<ThemeProvider theme={blueThemeLight}>
 			<FireBaseProvider>
 				<GlobalStyles />
-				<AuthGuard>
+				<LoaderProvider>
 					<Routes>
 						<Route path='/signup' element={<Landing type={LandingTypes.SIGNUP} />} />
 						<Route path='/signin' element={<Landing type={LandingTypes.SIGNIN} />} />
 						<Route path='/chat' element={<Chat />} />
 
 					</Routes>
-				</AuthGuard>
+				</LoaderProvider>
 			</FireBaseProvider>
 		</ThemeProvider>
 		// <>

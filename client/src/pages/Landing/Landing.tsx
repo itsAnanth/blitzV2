@@ -4,8 +4,10 @@ import { ErrorOverlay, InputContainer, LandingContainer, LandingContent, Landing
 import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { LandingTypes } from '../../utils/LandingTypes';
 import { FireBaseContext } from '../../contexts/firebase.context';
+import { LoaderContext } from '../../contexts/loader.context';
 function Landing({ type }: any) {
 
+    const loaderContext = useContext(LoaderContext);
     const authContext = useContext(FireBaseContext);
     const [error, setError] = useState();
     const navigate = useNavigate();
@@ -27,6 +29,10 @@ function Landing({ type }: any) {
         navigate('/chat');
 
     }
+
+    useEffect(() => {
+        loaderContext.setLoader(false);
+    }, [])
 
     useEffect(() => {
         console.log(authContext.user, 'landing state changed')

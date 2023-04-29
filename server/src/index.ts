@@ -1,11 +1,20 @@
 import Channel from "./structures/Channel/Channel";
 import HttpServer from "./structures/HttpServer";
 import WsServer from "./structures/WsServer";
-import { getChannelId } from "./utils";
+import { config } from "dotenv";
 import Logger from "./utils/Logger";
+
+config();
+
+
+import db from "./database/Main";
 
 const httpServer = new HttpServer(3000);
 Logger.DEV = true;
+
+
+
+
 
 declare module 'websocket' {
     interface connection {
@@ -31,4 +40,5 @@ declare module 'websocket' {
     wsServer.start();
 
     httpServer.setWsServer(wsServer);
+
 })();

@@ -3,7 +3,7 @@ import Channel from "../../server/src/structures/Channel/Channel";
 export namespace DataTypes {
     export namespace Server {
         export type CONNECT = [{ success: boolean, username?: string }];
-        export type MESSAGE_CREATE = [{ content: string, recipient: string, authorId: string, messageId: string, authorUsername: string }];
+        export type MESSAGE_CREATE = [{ content: string, recipient: string, authorId: string, messageId: string, authorUsername: string, timestamp: number }];
         export type GET_CHANNELS = ReturnType<Channel['serialize']>[];
 
 

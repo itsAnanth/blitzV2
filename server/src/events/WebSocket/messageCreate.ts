@@ -1,4 +1,5 @@
 import Message, { DataTypes } from "../../../../shared/Message";
+import db from "../../database/Main";
 import WsEvent from "../../structures/Events/WsEvent";
 import { getMessageId } from "../../utils";
 
@@ -15,9 +16,12 @@ export default new WsEvent<DataTypes.Client.MESSAGE_CREATE>({
         if (!room) return console.error('no active room');
 
 
-        room.broadCast(this.users, new Message({
+        const message = new Message<DataTypes.Server.MESSAGE_CREATE>({
             type: Message.types.MESSAGE_CREATE,
-            data: [{ ...(_message.data[0]), messageId: getMessageId(), authorId: user.id, authorUsername: user.username }]
-        }));
+            data: [{ ...(_message.data[0]), messageId: getMessageId(), authorId: user.id, authorUsername: user.username, timestamp: Date.now() }]
+        });
+
+        // await db.setMessage(message.data[0].messageId, message.encode())
+        room.broadCast(this.users, message);
     },
 })
