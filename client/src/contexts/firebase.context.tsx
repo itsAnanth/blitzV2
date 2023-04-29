@@ -15,7 +15,7 @@ const FireBaseProvider = ({ children }: any) => {
     useEffect(() => {
         console.log(firebaseUser);
         const auth = getAuth(app);
-        auth.setPersistence(inMemoryPersistence)
+        auth.setPersistence(browserLocalPersistence)
         const unsub = auth.onAuthStateChanged((user) => {
             console.log('state change', user);
             setFirebaseUser(user);

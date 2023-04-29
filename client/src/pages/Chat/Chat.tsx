@@ -7,6 +7,7 @@ import Message, { DataTypes } from "../../../../shared/Message";
 import { isCustomEvent } from "../../utils";
 import { Navigate, useNavigate } from "react-router-dom";
 import { FireBaseContext } from "../../contexts/firebase.context";
+import { LoaderContext } from "../../contexts/loader.context";
 
 function Chat() {
     const authContext = useContext(FireBaseContext);
@@ -20,6 +21,7 @@ function Chat() {
     const wsm = useContext(WebSocketContext);
     const [channels, setChannels] = useState<DataTypes.Server.GET_CHANNELS>([]);
     const [users, setUsers] = useState();
+    const loaderContext = useContext(LoaderContext);
 
     const [currentChannel, setCurrentChannel] = useState<string | null>(null);
     // useEffect(() => {
@@ -30,17 +32,35 @@ function Chat() {
 
     useEffect(() => {
 
+        loaderContext.setLoader(false);
         initChat();
 
-    }, [message]);
+    }, []);
 
     useEffect(() => {
         chatMainRef.current?.scrollTo({ 'top': chatMainRef.current.scrollHeight });
-    })
+    });
+
+    useEffect(() => {
+        
+        wsm.addEventListener(Message.types[Message.types.MESSAGE_CREATE], ev => {
+            if (!isCustomEvent(ev)) return;
+
+
+            const data: DataTypes.Server.MESSAGE_CREATE = ev.detail;
+
+
+            setMessage([...message, data[0]]);
+
+        });
+    }, [message]);
+
 
 
     function initChat() {
-        // if (!authContext.user) return navigate('/signup');
+
+
+        if (!authContext.user) return navigate('/signup');
 
 
         // textRef.current?.addEventListener('input', () => {
@@ -81,17 +101,6 @@ function Chat() {
                 data: [{ channelId: currentChannel || '123456' }]
             }))
         });
-
-        wsm.addEventListener(Message.types[Message.types.MESSAGE_CREATE], ev => {
-            if (!isCustomEvent(ev)) return;
-
-
-            const data: DataTypes.Server.MESSAGE_CREATE = ev.detail;
-
-
-            setMessage([...message, data[0]]);
-
-        });
     }
 
 
@@ -127,7 +136,7 @@ function Chat() {
     return (
         <>
             {/* <Loader active={loaderActive} /> */}
-            {user ?
+            {/* {user ? */}
                 <ChatDiv>
                     <ChatContainer>
                         <ChatHeader>
@@ -173,7 +182,7 @@ function Chat() {
                         </ChatContent>
                     </ChatContainer>
                 </ChatDiv>
-                : <Navigate to={'/signup'} />}
+                {/* : <Navigate to={'/signup'} />} */}
         </>
     )
 }

@@ -26,8 +26,6 @@ function Landing({ type }: any) {
 
         if (user.error) return setError(user.detail.split("/")[1].split("-").join(" "));
 
-        navigate('/chat');
-
     }
 
     useEffect(() => {
@@ -35,9 +33,12 @@ function Landing({ type }: any) {
     }, [])
 
     useEffect(() => {
-        console.log(authContext.user, 'landing state changed')
+        console.log(authContext.user, 'landing state changed');
+        
+        if (authContext.user) navigate('/chat')
         // if (authContext.user) navigate('/chat')
     }, [authContext.user])
+
     return (
         <>
             {authContext.user ? <Navigate to={'/chat'} /> :
