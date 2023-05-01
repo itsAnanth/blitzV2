@@ -3,7 +3,7 @@ import { createGlobalStyle } from "styled-components"
 export const GlobalStyles = createGlobalStyle`
 
 :root {
-	--primary: black;
+	--primary: ${({ theme }) => theme.primary};
 	--secondary: white;
 
 }
@@ -18,15 +18,18 @@ a {
 }
 /* scrollBar */
 ::-webkit-scrollbar {
-	width: 5px;
+	width: 8px;
+
 }
 ::-webkit-scrollbar-track {
-	background: #555;
+	padding-right: 1rem;
+	margin-right: 1rem;
+	background: ${({ theme }) => theme.secondary};
 }
 ::-webkit-scrollbar-thumb {
 	border-radius: 10px;
 	transition: 0.3s;
-	background: red;
+	background: ${({ theme }) => theme.primary};
 }
 img {
 	-webkit-touch-callout: none;

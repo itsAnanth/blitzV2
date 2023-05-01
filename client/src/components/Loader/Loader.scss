@@ -34,7 +34,7 @@ $tiles: 5;
         left: 0;
         width: 0;
         height: 20%;
-        background-color: var(--secondary);
+        background-color: var(--primary);
         transition: width .7s ease;
 
         @for $i from 0 through $tiles {
