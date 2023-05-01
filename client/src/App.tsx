@@ -3,7 +3,7 @@ import firebaseInit from "./structures/Firebase";
 import { Routes, Route } from 'react-router-dom';
 import { Chat, Landing, Test } from './pages';
 import { ThemeProvider } from 'styled-components';
-import { blueThemeLight } from './data/Theme';
+import { blueThemeLight, darkTheme } from './data/Theme';
 import { useContext } from 'react';
 import { WebSocketContext } from './contexts/websocket.context';
 import { LandingTypes } from './utils/LandingTypes';
@@ -26,7 +26,7 @@ function App() {
 	// wsm.connect()
 
 	return (
-		<ThemeProvider theme={blueThemeLight}>
+		<ThemeProvider theme={darkTheme}>
 			<FireBaseProvider>
 				<GlobalStyles />
 				<LoaderProvider>

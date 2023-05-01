@@ -22,7 +22,7 @@ export const LandingHeader = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    color: ${({ theme }) => theme.bg};
+    color: ${({ theme }) => theme.text};
     font-size: 2rem;
     font-weight: 500;
     width: 100%;
@@ -51,11 +51,15 @@ export const LandingInput = styled.input`
     height: 2.5rem;
     line-height: 30px;
     padding: 0 1rem;
+    color: ${({ theme }) => theme.primary};
+    font-weight: 500;
+
 
 `;
 
 export const LandingHeading = styled.div`
     margin: 1rem;
+    color: ${({ theme }) => theme.lightText};
 `
 
 export const InputContainer = styled.div`
@@ -73,6 +77,8 @@ export const SubmitButton = styled.button`
     height: 2rem;
     border-radius: 30px;
     margin: 1rem 1rem;
+    color: ${({ theme }) => theme.primary};
+    font-weight: 500;
 `;
 
 export const ErrorOverlay = styled.div`
@@ -82,6 +88,7 @@ export const ErrorOverlay = styled.div`
     align-items: center;
     color: red;
     font-size: 1.2rem;
+    margin: 1rem 0;
 `;
 
 export const LandingFooter = styled.div`
@@ -92,7 +99,7 @@ export const LandingFooter = styled.div`
     align-items: center;
     justify-content: flex-end;
     padding-right: 50px;
-    color: ${({ theme }) => theme.bg};
+    color: ${({ theme }) => theme.lightText};
     font-weight: 400;
 
 `

@@ -1,11 +1,11 @@
 import { ChatContainer, ChatContent, ChatDiv, ChatHeader, ChatHeaderBrand, ChatMain, ChatMainContent, ChatMainForm, ChatMainFormSend, ChatSidebar, ChatSidebarContainer, ChatSidebarContent, User, UserAvatar, UsersContainer } from "./Chat.styled";
-import { ChatMessage, Loader } from "../../components";
+import { ChatMessage } from "../../components";
 import { AiOutlineSend } from 'react-icons/ai';
 import { useContext, useState, useEffect, useRef } from "react";
 import { WebSocketContext } from "../../contexts/websocket.context";
 import Message, { DataTypes } from "../../../../shared/Message";
 import { isCustomEvent } from "../../utils";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FireBaseContext } from "../../contexts/firebase.context";
 import { LoaderContext } from "../../contexts/loader.context";
 

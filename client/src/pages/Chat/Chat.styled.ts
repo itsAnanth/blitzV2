@@ -35,7 +35,8 @@ export const ChatHeaderBrand = styled.div`
     padding-left: 40px;
     font-weight: 600;
     font-size: 1.3rem;
-    color: ${({ theme }) => theme.bg};
+    color: ${({ theme }) => theme.text};
+    
 `;
 
 export const ChatContent = styled.div`
@@ -106,9 +107,11 @@ export const ChatMainContent = styled.div`
     position: relative;
     background-color: ${({ theme }) => theme.bg};
     width: 100%;
+    max-width: 100%;
     height: 100%;
     flex: 80%;
     overflow-y: scroll;
+    padding: 0.8rem;
 `;
 
 export const ChatMessage = styled.div`
@@ -119,11 +122,14 @@ export const ChatMessage = styled.div`
     user-select: none;
     flex-direction: row;
     align-items: flex-start;
+    padding-top: 0.8rem;
+    margin: 0.5rem 0;
 
     transition: background-color 0.3;
 
     :hover {
-        background-color: ${({ theme }) => theme.tertiary50};
+        background-color: ${({ theme }) => theme.tertiary};
+        border-radius: 10px;
 
     }
 `;
@@ -158,13 +164,17 @@ export const MetaAuthor = styled.div`
     max-width: 50%;
     font-size: 1rem;
     margin-right: 1rem;
-    font-weight: 500;
+    font-weight: 450;
+    color: ${({ theme }) => theme.text};
+    
 `
 
 export const MetaTimestamp = styled.div`
     font-size: 0.7rem;
     line-height: 1rem;
     max-width: 20%;
+    color: ${({ theme }) => theme.lightText};
+
 `
 
 export const ChatMessageContent = styled.div`
@@ -222,7 +232,7 @@ export const ChatMainFormSend = styled.button`
     background-color: transparent;
     height: 100%;
     font-size: 2rem;
-    color: ${({ theme }) => theme.bg};
+    color: ${({ theme }) => theme.text};
     display: flex;
     align-items: center;
     justify-content: center;

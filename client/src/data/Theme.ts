@@ -8,6 +8,8 @@ type Theme = {
     bg50: string;
     tertiary50: string;
     secondary50: string;
+    lightbg: string;
+    lightText: string;
 }
 
 
@@ -21,7 +23,24 @@ export const blueThemeLight: Theme = {
     text: '#000000',
     bg50: '#e6e9ff50',
     tertiary50: '#7386ff50',
-    secondary50: '#667aff50'
+    secondary50: '#667aff50',
+    lightbg: '',
+    lightText: '#ccc'
+
+}
+
+export const darkTheme: Theme = {
+    type: 'dark',
+    primary: '#202225',
+    secondary: '#292b2f',
+    tertiary: '#2f3136',
+    bg: '#40444b',
+    lightbg: '#40444b',
+    text: 'white',
+    secondary50: '',
+    tertiary50: '',
+    bg50: '',
+    lightText: '#ccc'
 
 }
 
@@ -32,7 +51,8 @@ const type = {
 };
 
 const all = {
-    blueThemeLight
+    blueThemeLight,
+    darkTheme
 }
 
 export { type, all };

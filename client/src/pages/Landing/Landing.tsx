@@ -9,7 +9,7 @@ function Landing({ type }: any) {
 
     const loaderContext = useContext(LoaderContext);
     const authContext = useContext(FireBaseContext);
-    const [error, setError] = useState();
+    const [error, setError] = useState<string|null>(null);
     const navigate = useNavigate();
     async function onSubmit(ev: any) {
         ev.preventDefault();
@@ -27,6 +27,10 @@ function Landing({ type }: any) {
         if (user.error) return setError(user.detail.split("/")[1].split("-").join(" "));
 
     }
+
+    useEffect(() => {
+        setError(null);
+    }, [type])
 
     useEffect(() => {
         loaderContext.setLoader(false);
@@ -49,7 +53,7 @@ function Landing({ type }: any) {
                             onSubmit={onSubmit}
                             autoComplete="off"
                         >
-                            <ErrorOverlay>{error}</ErrorOverlay>
+                            {error && <ErrorOverlay>{error}</ErrorOverlay>}
                             {type === LandingTypes.SIGNUP &&
 
                                 <InputContainer>
