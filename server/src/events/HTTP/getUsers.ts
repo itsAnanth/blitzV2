@@ -13,10 +13,13 @@ export default new HttpEvent({
 
         if (!channel) return res.send('invalid channel');
 
-        const data = [];
+        const data: { [id: string]: any } = {};
 
         for (let i = 0; i < channel.members.length; i++) {
-            data.push(this.WsServer.users.get(channel.members[i]).serialize());
+            const serialized = this.WsServer.users.get(channel.members[i]).serialize();
+            const id = serialized.id;
+            delete serialized.id;
+            data[id] = (serialized);
         }
 
 

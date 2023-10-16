@@ -29,8 +29,21 @@ export default new WsEvent<DataTypes.Client.JOIN_CHANNEL>({
 
         channel.broadCast(this.users, new Message<DataTypes.Server.MESSAGE_CREATE>({
             type: Message.types.MESSAGE_CREATE,
-            data: [{ content: `${user.username} has joined the chat!`, recipient: '', authorUsername: 'Blitz Bot', authorId: 'bot', 'messageId': getMessageId(), timestamp: Date.now() }]
+            data: [{ content: `${user.username} has joined the chat!`, recipient: '', authorUsername: 'Blitz Bot', authorId: 'bot', 'messageId': getMessageId(), timestamp: Date.now(), avatar: 0 }]
         }));
+
+        // ws.send(new Message({
+        //     type: Message.types.JOIN_CHANNEL,
+        //     data: ['Authorized']
+        // }).encode());
+
+
+        channel.broadCast(this.users, new Message<DataTypes.Server.JOIN_CHANNEL>({
+            type: Message.types.JOIN_CHANNEL,
+            data: channel.getUsers(this.users)
+        }))
+
+        
 
         
         console.log(`User joined channel ${channel.id}`, channel.members);

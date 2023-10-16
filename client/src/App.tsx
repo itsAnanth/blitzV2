@@ -1,6 +1,6 @@
 import { GlobalStyles } from './Global.styled';
 import firebaseInit from "./structures/Firebase";
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { Chat, Landing, Test } from './pages';
 import { ThemeProvider } from 'styled-components';
 import { blueThemeLight, darkTheme } from './data/Theme';
@@ -31,6 +31,7 @@ function App() {
 				<GlobalStyles />
 				<LoaderProvider>
 					<Routes>
+						<Route path='/' element={<Navigate to={'/signup'} />} />
 						<Route path='/signup' element={<Landing type={LandingTypes.SIGNUP} />} />
 						<Route path='/signin' element={<Landing type={LandingTypes.SIGNIN} />} />
 						<Route path='/chat' element={<Chat />} />

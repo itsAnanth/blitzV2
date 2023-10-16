@@ -4,6 +4,7 @@ abstract class User {
     username: string;
     avatar: number;
     publicKeyJwk: JsonWebKey;
+    abstract serialize(): { username: string, avatar: number, id: string };
 }
 
 export default User;

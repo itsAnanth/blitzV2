@@ -1,4 +1,5 @@
 import Message from "../../../../shared/Message";
+import User from "../User/User";
 import WsServer from "../WsServer";
 
 class Channel {
@@ -19,6 +20,19 @@ class Channel {
 
     removeUser(userId: string) {
         this.members.splice(this.members.indexOf(userId), 1);
+    }
+
+    getUsers(users: WsServer['users']) {
+        const res: ReturnType<User['serialize']>[] = [];
+        for (let i = 0; i < this.members.length; i++) {
+            const user = users.get(this.members[i]);
+
+            if (!user) continue;
+            res.push(user.serialize());
+            
+        }
+
+        return res;
     }
 
     broadCast(users: WsServer['users'], message: Message) {

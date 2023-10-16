@@ -20,7 +20,7 @@ class WsManager extends EventTarget {
         this.ws = null;
         this.lt = performance.now();
         this.host = import.meta.env[import.meta.env.DEV ? 'VITE_SERVER_DEV' : 'VITE_SERVER_PROD'];
-        this.wsprotocol = window.location.protocol === 'http:' ? 'ws' : 'wss';
+        this.wsprotocol = 'ws'; //window.location.protocol === 'http:' ? 'ws' : 'wss';
         this.httpprotocol = window.location.protocol === 'http:' ? 'http' : 'https';
         this._lastMessageSent = { m: null, t: Date.now() };
         this._open = false;

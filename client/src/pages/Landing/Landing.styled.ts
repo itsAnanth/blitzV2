@@ -16,6 +16,11 @@ export const LandingContainer = styled.div`
     align-content: flex-start;
     justify-content: flex-start;
     flex-direction: column;
+
+    @media (max-width: 800px) {
+        width: 100%;
+        height: 100%;
+    }
 `;
 
 export const LandingHeader = styled.div`
@@ -101,5 +106,10 @@ export const LandingFooter = styled.div`
     padding-right: 50px;
     color: ${({ theme }) => theme.lightText};
     font-weight: 400;
+
+    @media (max-width: 800px) {
+        font-size: 0.7rem;
+        padding-left: 1rem;
+    }
 
 `

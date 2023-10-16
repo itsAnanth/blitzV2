@@ -12,20 +12,17 @@ class ServerUser extends User {
         username,
         socket,
         avatar,
-        // publicKeyJwk,
         id
     }: {
         username: string,
         socket: connection,
         avatar: number,
-        // publicKeyJwk: JsonWebKey,
         id: string;
     }) {
         super();
         this.username = username;
         this.socket = socket;
         this.avatar = avatar;
-        // this.publicKeyJwk = publicKeyJwk;
         this.id = id;
         this.activeChannel = null;
     }

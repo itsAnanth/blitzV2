@@ -1,4 +1,4 @@
-import { ChatContainer, ChatContent, ChatDiv, ChatHeader, ChatHeaderBrand, ChatMain, ChatMainContent, ChatMainForm, ChatMainFormSend, ChatSidebar, ChatSidebarContainer, ChatSidebarContent, User, UserAvatar, UsersContainer } from "./Chat.styled";
+import { ChatContainer, ChatContent, ChatDiv, ChatHeader, ChatHeaderBrand, ChatMain, ChatMainContent, ChatMainForm, ChatMainFormSend, ChatSidebar, ChatSidebarContainer, ChatSidebarContent, User, UserAvatar, UserDetail, UsersContainer } from "./Chat.styled";
 import { ChatMessage } from "../../components";
 import { AiOutlineSend } from 'react-icons/ai';
 import { useContext, useState, useEffect, useRef } from "react";
@@ -20,7 +20,7 @@ function Chat() {
     const [message, setMessage] = useState<messageType[]>([]);
     const wsm = useContext(WebSocketContext);
     const [channels, setChannels] = useState<DataTypes.Server.GET_CHANNELS>([]);
-    const [users, setUsers] = useState();
+    const [users, setUsers] = useState<({ username: string, avatar: number, id: string })[]>([]);
     const loaderContext = useContext(LoaderContext);
 
     const [currentChannel, setCurrentChannel] = useState<string | null>(null);
@@ -32,17 +32,24 @@ function Chat() {
 
     useEffect(() => {
 
-        loaderContext.setLoader(false);
         initChat();
 
+        console.log(users, 'users');
+        loaderContext.setLoader(false);
+
+
     }, []);
+
+    useEffect(() => {
+        console.log(users)
+    }, [users])
 
     useEffect(() => {
         chatMainRef.current?.scrollTo({ 'top': chatMainRef.current.scrollHeight });
     });
 
     useEffect(() => {
-        
+
         wsm.addEventListener(Message.types[Message.types.MESSAGE_CREATE], ev => {
             if (!isCustomEvent(ev)) return;
 
@@ -55,6 +62,14 @@ function Chat() {
         });
     }, [message]);
 
+    async function getUsers() {
+        const res = await fetch('http://localhost:3000/users?channelId=123456');
+        const val = await res.json();
+        setUsers({ ...val });
+
+        console.log(users, 'GETUSERS');
+
+    }
 
 
     function initChat() {
@@ -89,8 +104,20 @@ function Chat() {
             wsm.send(new Message<DataTypes.Client.USER_JOIN>({
                 type: Message.types.USER_JOIN,
                 // @ts-ignore
-                data: [{ username: user.displayName || 'unknown user', userId: user.uid, avatar: 0 }]
+                data: [{ username: user.displayName || 'unknown user', userId: user.uid, avatar: Math.floor(Math.random() * 50) }]
             }))
+        });
+
+
+        wsm.addEventListener(Message.types[Message.types.JOIN_CHANNEL], ev => {
+            if (!isCustomEvent(ev)) return;
+
+            const msg: DataTypes.Server.JOIN_CHANNEL = ev.detail;
+            console.log('JOIN CHANNLE', msg)
+
+            setUsers(msg);
+
+            // getUsers();
         })
 
         wsm.addEventListener(Message.types[Message.types.USER_JOIN], ev => {
@@ -137,52 +164,60 @@ function Chat() {
         <>
             {/* <Loader active={loaderActive} /> */}
             {/* {user ? */}
-                <ChatDiv>
-                    <ChatContainer>
-                        <ChatHeader>
-                            <ChatHeaderBrand>Blitz App</ChatHeaderBrand>
-                        </ChatHeader>
+            <ChatDiv>
+                <ChatContainer>
+                    <ChatHeader>
+                        <ChatHeaderBrand>Blitz App</ChatHeaderBrand>
+                    </ChatHeader>
 
-                        <ChatContent>
-                            <ChatSidebar>
+                    <ChatContent>
+                        <ChatSidebar>
 
-                                {/* <UsersContainer><User><UserAvatar></UserAvatar></User></UsersContainer> */}
-                                {channels.map((item, i) =>
+                            <UsersContainer>{
+                                users.map(user => {
+                                    return (
+                                        <User><UserAvatar src={`https://avatars.dicebear.com/api/adventurer-neutral/${user.avatar}.png`}></UserAvatar><UserDetail>{user.username}</UserDetail></User>
+                                    )
+                                })
+                            }
+                            </UsersContainer>
+                            {/* {channels.map((item, i) =>
                                     <ChatSidebarContainer
                                         key={i}
                                         onClick={() => joinChannel(i)}
                                     >
                                         <ChatSidebarContent className={currentChannel == channels[i].id ? 'active' : ''}>{item.name}</ChatSidebarContent>
-                                    </ChatSidebarContainer>)}
-                            </ChatSidebar>
-                            <ChatMain>
-                                <ChatMainContent ref={chatMainRef}>
-                                    {message.map((item, i) => (
-                                        <ChatMessage
-                                            author={item.authorUsername}
-                                            content={item.content}
-                                            timestamp={new Date(Date.now()).toLocaleDateString()}
-                                            key={i}
-                                        />
-                                    ))}
-                                </ChatMainContent>
-                                <ChatMainForm ref={formContainerRef}>
+                                    </ChatSidebarContainer>)} */}
+                        </ChatSidebar>
+                        <ChatMain>
+                            <ChatMainContent ref={chatMainRef}>
+                                {message.map((item, i) => (
+                                    <ChatMessage
+                                        avatar={item.avatar}
+                                        author={item.authorUsername}
+                                        content={item.content}
+                                        timestamp={new Date(Date.now()).toLocaleDateString()}
+                                        key={i}
+                                    />
+                                ))}
+                            </ChatMainContent>
+                            <ChatMainForm ref={formContainerRef}>
 
-                                    <form onSubmit={sendMessage}>
-                                        <input
-                                            ref={textRef}
-                                            placeholder="Message"
-                                            name="message"
-                                            autoComplete="off"
-                                        />
-                                        <ChatMainFormSend type="submit"><AiOutlineSend /></ChatMainFormSend>
-                                    </form>
-                                </ChatMainForm>
-                            </ChatMain>
-                        </ChatContent>
-                    </ChatContainer>
-                </ChatDiv>
-                {/* : <Navigate to={'/signup'} />} */}
+                                <form onSubmit={sendMessage}>
+                                    <input
+                                        ref={textRef}
+                                        placeholder="Message"
+                                        name="message"
+                                        autoComplete="off"
+                                    />
+                                    <ChatMainFormSend type="submit"><AiOutlineSend /></ChatMainFormSend>
+                                </form>
+                            </ChatMainForm>
+                        </ChatMain>
+                    </ChatContent>
+                </ChatContainer>
+            </ChatDiv>
+            {/* : <Navigate to={'/signup'} />} */}
         </>
     )
 }

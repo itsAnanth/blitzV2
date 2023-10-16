@@ -66,6 +66,10 @@ export const ChatSidebar = styled.div`
         }
     }
 
+    @media (max-width: 800px) {
+        display: none;
+    }
+
 `;
 
 export const ChatSidebarContent = styled.div`
@@ -111,7 +115,7 @@ export const ChatMainContent = styled.div`
     height: 100%;
     flex: 80%;
     overflow-y: scroll;
-    padding: 0.8rem;
+    padding: 0 0.8rem;
 `;
 
 export const ChatMessage = styled.div`
@@ -122,7 +126,7 @@ export const ChatMessage = styled.div`
     user-select: none;
     flex-direction: row;
     align-items: flex-start;
-    padding-top: 0.8rem;
+    padding-top: 0.5rem;
     margin: 0.5rem 0;
 
     transition: background-color 0.3;
@@ -141,7 +145,6 @@ export const ChatMessageAvatar = styled.img`
     object-fit: cover;
     margin-right: 1rem;
     border-radius: 50%;
-    background-color: red;
 `;
 
 export const ChatMessageMetaWrapper = styled.div`
@@ -240,23 +243,40 @@ export const ChatMainFormSend = styled.button`
 
 export const UsersContainer = styled.div`
     width: 100%;
-    height: 40px;
+    height: 100%;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    flex-direction: column;
     margin: 5px 0;
 
 `
 
 export const User = styled.div`
+    margin-top: 1rem;
+    max-height: 70px;
     display: flex;
     width: 95%;
     height: 100%;
+    align-items: center;
+    padding: 1rem 1rem;
+
+    :hover {
+        background-color: ${({ theme }) => theme.lightbg};
+    }
 `;
 
 export const UserAvatar = styled.img`
-    max-width: 30px;
-    width: auto;
-    height: auto;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-`
+`;
+
+export const UserDetail = styled.div`
+    display: flex;
+    align-items: center;
+    padding-left: 1rem;
+    color: ${({ theme }) => theme.text};
+    font-weight: 400;
+    height: 100%;
+    width: 100%;
+`;

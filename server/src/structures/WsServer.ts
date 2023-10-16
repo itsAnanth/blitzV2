@@ -2,9 +2,9 @@ import { server } from "websocket";
 import fs from 'fs';
 import { createServer } from 'http'
 import WsEvent from "./Events/WsEvent";
-import Message, { MessageTypes } from "../../../shared/Message";
+import Message, { DataTypes, MessageTypes } from "../../../shared/Message";
 import User from "./User/User";
-import { Logger } from "../utils";
+import { Logger, getMessageId } from "../utils";
 
 import colors from 'colors/safe';
 import Room from "./Channel/Channel";
@@ -74,11 +74,29 @@ class WsServer extends server {
             const user = this.users.get(connection.id);
 
 
+            let channel = this.channels.get(user.activeChannel);
+
+
+            
+            channel.broadCast(this.users, new Message<DataTypes.Server.MESSAGE_CREATE>({
+                type: Message.types.MESSAGE_CREATE,
+                data: [{ content: `${user.username} has left the chat!`, recipient: '', authorUsername: 'Blitz Bot', authorId: 'bot', 'messageId': getMessageId(), timestamp: Date.now(), avatar: 0 }]
+            }));
+
+
+
+
+
             if (user && user.activeChannel) {
                 const channel = this.channels.get(user.activeChannel);
 
                 channel.members.splice(channel.members.indexOf(user.id), 1);
             }
+
+            channel.broadCast(this.users, new Message<DataTypes.Server.JOIN_CHANNEL>({
+                type: Message.types.JOIN_CHANNEL,
+                data: channel.getUsers(this.users)
+            }))
 
             this.users.delete(connection.id);
 

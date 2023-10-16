@@ -18,7 +18,7 @@ export default new WsEvent<DataTypes.Client.MESSAGE_CREATE>({
 
         const message = new Message<DataTypes.Server.MESSAGE_CREATE>({
             type: Message.types.MESSAGE_CREATE,
-            data: [{ ...(_message.data[0]), messageId: getMessageId(), authorId: user.id, authorUsername: user.username, timestamp: Date.now() }]
+            data: [{ ...(_message.data[0]), messageId: getMessageId(), authorId: user.id, authorUsername: user.username, timestamp: Date.now(), avatar: user.avatar }]
         });
 
         // await db.setMessage(message.data[0].messageId, message.encode())
