@@ -1,15 +1,16 @@
 import { useState, useEffect, useContext } from 'react';
 import AccountManager from "../../structures/AccountManager";
-import { ErrorOverlay, InputContainer, LandingContainer, LandingContent, LandingDiv, LandingFooter, LandingHeader, LandingHeading, LandingInput, SubmitButton } from "./Landing.styled";
+import { CheckBox, CheckBoxContainer, CheckBoxLabel, ErrorOverlay, InputContainer, LandingContainer, LandingContent, LandingDiv, LandingFooter, LandingHeader, LandingHeading, LandingInput, SubmitButton } from "./Landing.styled";
 import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { LandingTypes } from '../../utils/LandingTypes';
 import { FireBaseContext } from '../../contexts/firebase.context';
 import { LoaderContext } from '../../contexts/loader.context';
+import { getPersistence, setPersistence } from '../../utils';
 function Landing({ type }: any) {
 
     const loaderContext = useContext(LoaderContext);
     const authContext = useContext(FireBaseContext);
-    const [error, setError] = useState<string|null>(null);
+    const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
     async function onSubmit(ev: any) {
         ev.preventDefault();
@@ -26,6 +27,8 @@ function Landing({ type }: any) {
 
         if (user.error) return setError(user.detail.split("/")[1].split("-").join(" "));
 
+        setPersistence(ev.target.checkbox.checked ? true : false);
+
     }
 
     useEffect(() => {
@@ -38,7 +41,7 @@ function Landing({ type }: any) {
 
     useEffect(() => {
         console.log(authContext.user, 'landing state changed');
-        
+
         if (authContext.user) navigate('/chat')
         // if (authContext.user) navigate('/chat')
     }, [authContext.user])
@@ -63,7 +66,7 @@ function Landing({ type }: any) {
                                         name="username"
                                         id="username"
                                         placeholder={type === LandingTypes.SIGNUP ? 'What should everyone call you' : 'Username'}
-                                        autoComplete='true'
+                                        autoComplete='off'
                                         required
                                     />
                                 </InputContainer>}
@@ -71,11 +74,12 @@ function Landing({ type }: any) {
                                 <LandingHeading>Email</LandingHeading>
 
                                 <LandingInput
+                                    
                                     type="email"
                                     name="email"
                                     id="email"
                                     placeholder="Email"
-                                    autoComplete='true'
+                                    autoComplete='on'
                                     required
                                 />
                             </InputContainer>
@@ -86,14 +90,31 @@ function Landing({ type }: any) {
                                     type="password"
                                     name="password"
                                     id="password"
-                                    autoComplete='true'
+                                    autoComplete='on'
                                     placeholder="password"
                                     required
                                 />
                             </InputContainer>
+
                             <InputContainer>
                                 <SubmitButton type="submit">{type === LandingTypes.SIGNUP ? 'Sign Up' : 'Sign In'}</SubmitButton>
                             </InputContainer>
+
+                            <CheckBoxContainer>
+                                <CheckBoxLabel>
+                                    Remember Me
+                                    <CheckBox
+                                        style={{ transform: "scale(0.5)", width: "10%" }}
+                                        type="checkbox"
+                                        value={"checkbox"}
+                                        name='checkbox'
+                                        checked={getPersistence()}
+                                    />
+                                </CheckBoxLabel>
+
+
+
+                            </CheckBoxContainer>
                         </LandingContent>
                         <LandingFooter>{type === LandingTypes.SIGNUP ?
                             <>

@@ -113,3 +113,31 @@ export const LandingFooter = styled.div`
     }
 
 `
+
+export const CheckBoxContainer = styled.div`
+
+    /* width: 100%; */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: row;
+    width: 100%;
+    padding-bottom: 1rem;
+
+`; 
+export const CheckBoxLabel = styled.label`
+    color: ${({ theme }) => theme.text};
+    padding-left: 10%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 50%;
+    flex-grow: 1;
+    flex-direction: row;
+`
+export const CheckBox = styled(LandingInput)`
+    transform: scale(0.5);
+    width: 10%;
+    max-width: 45px;
+    border: none;
+`

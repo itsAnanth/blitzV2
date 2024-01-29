@@ -15,8 +15,8 @@ export default new HttpEvent({
 
         const data: { [id: string]: any } = {};
 
-        for (let i = 0; i < channel.members.length; i++) {
-            const serialized = this.WsServer.users.get(channel.members[i]).serialize();
+        for (let i = 0; i < channel.users.length; i++) {
+            const serialized = this.WsServer.users.get(channel.users[i]).serialize();
             const id = serialized.id;
             delete serialized.id;
             data[id] = (serialized);

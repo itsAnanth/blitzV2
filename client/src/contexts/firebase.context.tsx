@@ -3,6 +3,7 @@ import firebaseInit from '../structures/Firebase';
 import firebase from 'firebase/app';
 import { browserLocalPersistence, getAuth, inMemoryPersistence, User } from 'firebase/auth';
 import { WebSocketContext } from './websocket.context';
+import { getPersistence } from '../utils';
 
 const FireBaseContext = createContext<{ app: firebase.FirebaseApp, user: User | null | undefined }>(null as any);
 
@@ -15,7 +16,9 @@ const FireBaseProvider = ({ children }: any) => {
     useEffect(() => {
         console.log(firebaseUser);
         const auth = getAuth(app);
-        auth.setPersistence(browserLocalPersistence)
+        const rememberme = getPersistence();
+        console.log("????????????remember", rememberme)
+        auth.setPersistence(rememberme ? browserLocalPersistence : inMemoryPersistence)
         const unsub = auth.onAuthStateChanged((user) => {
             console.log('state change', user);
             setFirebaseUser(user);

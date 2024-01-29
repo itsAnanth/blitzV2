@@ -1,5 +1,5 @@
 import Message, { DataTypes } from "../../../../shared/Message";
-import db from "../../database/Main";
+// import db from "../../database/Main";
 import WsEvent from "../../structures/Events/WsEvent";
 import { getMessageId } from "../../utils";
 
@@ -20,6 +20,8 @@ export default new WsEvent<DataTypes.Client.MESSAGE_CREATE>({
             type: Message.types.MESSAGE_CREATE,
             data: [{ ...(_message.data[0]), messageId: getMessageId(), authorId: user.id, authorUsername: user.username, timestamp: Date.now(), avatar: user.avatar }]
         });
+
+        console.log(`Message Length ${message.encode().length}`);
 
         // await db.setMessage(message.data[0].messageId, message.encode())
         room.broadCast(this.users, message);

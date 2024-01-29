@@ -176,7 +176,7 @@ function Chat() {
                             <UsersContainer>{
                                 users.map(user => {
                                     return (
-                                        <User><UserAvatar src={`https://avatars.dicebear.com/api/adventurer-neutral/${user.avatar}.png`}></UserAvatar><UserDetail>{user.username}</UserDetail></User>
+                                        <User><UserAvatar src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.avatar}`}></UserAvatar><UserDetail>{user.username}</UserDetail></User>
                                     )
                                 })
                             }

@@ -7,7 +7,7 @@ function ChatMessage({ author, content, timestamp, avatar }: {
 
         <ChatMessageDiv>
             <ChatMessageAvatar
-                src={`https://avatars.dicebear.com/api/adventurer-neutral/${avatar}.png`}
+                src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=${avatar}`}
             />
             <ChatMessageMetaWrapper>
                 <ChatMessageMeta>

@@ -20,7 +20,7 @@ export default new WsEvent<DataTypes.Client.JOIN_CHANNEL>({
 
         if (user.activeChannel) {
             let usersChannel = this.channels.get(user.activeChannel);
-            usersChannel.members.splice(usersChannel.members.indexOf(user.id), 1);
+            usersChannel.users.splice(usersChannel.users.indexOf(user.id), 1);
         }
 
         user.activeChannel = channel.id;
@@ -46,7 +46,7 @@ export default new WsEvent<DataTypes.Client.JOIN_CHANNEL>({
         
 
         
-        console.log(`User joined channel ${channel.id}`, channel.members);
+        console.log(`User joined channel ${channel.id}`, channel.users);
         
     },
 })

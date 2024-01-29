@@ -8,9 +8,11 @@ import { Logger, getMessageId } from "../utils";
 
 import colors from 'colors/safe';
 import Room from "./Channel/Channel";
+import Cache from "./Cache/Cache";
 
 class WsServer extends server {
 
+    cache: Cache
     // this map consists of all the events located under /events folder
     // websocket reads the functions to execute on a specific message from here
     events: Map<MessageTypes, WsEvent>;
@@ -23,9 +25,10 @@ class WsServer extends server {
         if (!httpServer) throw new Error('No http server found');
         super({ httpServer: httpServer });
 
+        this.cache = new Cache();
         this.events = new Map();
         this.users = new Map();
-        this.channels = new Map();
+        this.channels = this.cache.channels;// new Map();
     }
 
     async init() {
@@ -90,7 +93,7 @@ class WsServer extends server {
             if (user && user.activeChannel) {
                 const channel = this.channels.get(user.activeChannel);
 
-                channel.members.splice(channel.members.indexOf(user.id), 1);
+                channel.users.splice(channel.users.indexOf(user.id), 1);
             }
 
             channel.broadCast(this.users, new Message<DataTypes.Server.JOIN_CHANNEL>({

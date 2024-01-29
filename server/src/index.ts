@@ -7,7 +7,7 @@ import Logger from "./utils/Logger";
 config();
 
 
-import db from "./database/Main";
+// import db from "./database/Main";
 
 const httpServer = new HttpServer(3000);
 Logger.DEV = true;
@@ -30,6 +30,8 @@ declare module 'websocket' {
 
 
     await wsServer.init();
+
+    console.log(">>>>", wsServer)
 
     wsServer.channels.set('123456', new Channel({ id: '123456', name: 'main' }));
 

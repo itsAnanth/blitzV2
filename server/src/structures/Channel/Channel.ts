@@ -4,28 +4,31 @@ import WsServer from "../WsServer";
 
 class Channel {
 
-    members: string[];
+    users: string[];
     id: string;
     name: string;
 
+    _lastUpdate: number;
+    _cacheFlush: number;
+
     constructor({ id, name }: { name: string, id: string }) {
         this.id = id;
-        this.members = [];
+        this.users = [];
         this.name = name;
     }
 
     addUser(userId: string) {
-        this.members.push(userId);
+        this.users.push(userId);
     }
 
     removeUser(userId: string) {
-        this.members.splice(this.members.indexOf(userId), 1);
+        this.users.splice(this.users.indexOf(userId), 1);
     }
 
     getUsers(users: WsServer['users']) {
         const res: ReturnType<User['serialize']>[] = [];
-        for (let i = 0; i < this.members.length; i++) {
-            const user = users.get(this.members[i]);
+        for (let i = 0; i < this.users.length; i++) {
+            const user = users.get(this.users[i]);
 
             if (!user) continue;
             res.push(user.serialize());
@@ -36,8 +39,8 @@ class Channel {
     }
 
     broadCast(users: WsServer['users'], message: Message) {
-        for (let i = 0; i < this.members.length; i++) {
-            const user = users.get(this.members[i]);
+        for (let i = 0; i < this.users.length; i++) {
+            const user = users.get(this.users[i]);
 
             console.log(user.id);
 

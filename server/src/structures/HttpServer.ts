@@ -33,6 +33,9 @@ class HttpServer {
             return Logger.log("Empter server events");
 
         for (let i = 0; i < eventsPath.length; i++) {
+
+            if (eventsPath[i].startsWith('.')) continue;
+
             const event = (await import(`../events/HTTP/${eventsPath[i]}`)).default as HttpEvent;
 
             const eventType = this.events.get(event.method);

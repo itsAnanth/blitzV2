@@ -49,7 +49,9 @@ export const ChatContent = styled.div`
 `;
 
 export const ChatSidebar = styled.div`
-    flex: 20%;
+    /* flex: 20%; */
+    max-width: 20%;
+    width: 15%;
     background-color: ${({ theme }) => theme.tertiary};
     display: flex;
     flex-direction: column;

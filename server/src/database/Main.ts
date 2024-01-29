@@ -48,6 +48,6 @@ class MainDb extends DbClient {
     }
 }
 
-const db = new MainDb();
+// const db = new MainDb();
 
-export default db;
+// export default db;
