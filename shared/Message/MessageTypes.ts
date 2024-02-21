@@ -10,7 +10,9 @@ enum MessageTypes {
     PONG,
     JOIN_CHANNEL,
     LEAVE_CHANNEL,
-    CREATE_CHANNEL
+    CREATE_CHANNEL,
+    GET_CHANNEL,
+    GET_CHANNELS
 };
 
 export default MessageTypes

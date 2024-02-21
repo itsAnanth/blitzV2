@@ -9,6 +9,9 @@ import { Logger, getMessageId } from "../utils";
 import colors from 'colors/safe';
 import Room from "./Channel/Channel";
 import Cache from "./Cache/Cache";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../database/Firebase";
+import Channel from "./Channel/Channel";
 
 class WsServer extends server {
 
@@ -47,6 +50,23 @@ class WsServer extends server {
 
         Logger.log(colors.blue('[WS_SERVER]'), [...this.events.keys()].map(x => MessageTypes[x]));
 
+        await this.loadChannelsFromDb();
+
+    }
+
+    async loadChannelsFromDb() {
+    
+        const querySnapshot = await getDocs(collection(db, "channels"));
+        querySnapshot.forEach((doc) => {
+            // doc.data() is never undefined for query doc snapshots
+
+            const data = doc.data();
+            // console.log("QUERY DATA>>", data)
+            const channel = new Channel({ id: data.id, name: data.name, users: data.users })
+            this.channels.set(channel.id, channel);
+        });
+
+        console.log("LOADED CHANNELS", this.channels)
     }
 
     private _sendErrorMessage() {

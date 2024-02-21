@@ -8,6 +8,7 @@ import { isCustomEvent } from "../../utils";
 import { useNavigate } from "react-router-dom";
 import { FireBaseContext } from "../../contexts/firebase.context";
 import { LoaderContext } from "../../contexts/loader.context";
+import AccountManager from "../../structures/AccountManager";
 
 function Chat() {
     const authContext = useContext(FireBaseContext);
@@ -16,6 +17,7 @@ function Chat() {
     const formContainerRef = useRef<HTMLDivElement>(null);
     const textRef = useRef<HTMLInputElement>(null);
     const chatMainRef = useRef<HTMLDivElement>(null);
+
     type messageType = DataTypes.Server.MESSAGE_CREATE[0];
     const [message, setMessage] = useState<messageType[]>([]);
     const wsm = useContext(WebSocketContext);
@@ -39,6 +41,10 @@ function Chat() {
 
 
     }, []);
+
+    useEffect(() => {
+        if (authContext.user === null) navigate('/')
+    }, [authContext.user])
 
     useEffect(() => {
         console.log(users)
@@ -109,25 +115,31 @@ function Chat() {
         });
 
 
-        wsm.addEventListener(Message.types[Message.types.JOIN_CHANNEL], ev => {
-            if (!isCustomEvent(ev)) return;
 
-            const msg: DataTypes.Server.JOIN_CHANNEL = ev.detail;
-            console.log('JOIN CHANNLE', msg)
 
-            setUsers(msg);
+        wsm.addEventListener(Message.types[Message.types.JOIN_CHANNEL], joinChannelEvent)
 
-            // getUsers();
-        })
+        wsm.addEventListener(Message.types[Message.types.USER_JOIN], userJoinEvent);
+    }
 
-        wsm.addEventListener(Message.types[Message.types.USER_JOIN], ev => {
-            setCurrentChannel('123456');
+    const joinChannelEvent = (ev: any) => {
+        if (!isCustomEvent(ev)) return;
 
-            wsm.send(new Message<DataTypes.Client.JOIN_CHANNEL>({
-                type: Message.types.JOIN_CHANNEL,
-                data: [{ channelId: currentChannel || '123456' }]
-            }))
-        });
+        const msg: DataTypes.Server.JOIN_CHANNEL = ev.detail;
+        console.log('JOIN CHANNLE', msg)
+
+        setUsers(msg);
+
+        // getUsers();
+    }
+
+    const userJoinEvent = () => {
+        setCurrentChannel('12345');
+
+        wsm.send(new Message<DataTypes.Client.JOIN_CHANNEL>({
+            type: Message.types.JOIN_CHANNEL,
+            data: [{ channelId: currentChannel || '12345' }]
+        }))
     }
 
 
@@ -148,17 +160,28 @@ function Chat() {
         target.message.value = '';
     }
 
+    const signOut = () => {
+        AccountManager.signOut();
+        wsm.disconnect();
+        setUsers([]);
+        setMessage([]);
 
-    const joinChannel = (i: number) => {
-        const channel = channels[i];
+        wsm.removeEventListener(Message.types[Message.types.JOIN_CHANNEL], joinChannelEvent);
+        wsm.removeEventListener(Message.types[Message.types.JOIN_CHANNEL], userJoinEvent);
 
-        setCurrentChannel(channel.id);
-
-        wsm.send(new Message<DataTypes.Client.JOIN_CHANNEL>({
-            type: Message.types.JOIN_CHANNEL,
-            data: [{ channelId: channel.id }]
-        }))
     }
+
+
+    // const joinChannel = (i: number) => {
+    //     const channel = channels[i];
+
+    //     setCurrentChannel(channel.id);
+
+    //     wsm.send(new Message<DataTypes.Client.JOIN_CHANNEL>({
+    //         type: Message.types.JOIN_CHANNEL,
+    //         data: [{ channelId: channel.id }]
+    //     }))
+    // }
 
     return (
         <>
@@ -168,6 +191,7 @@ function Chat() {
                 <ChatContainer>
                     <ChatHeader>
                         <ChatHeaderBrand>Blitz App</ChatHeaderBrand>
+                        <div onClick={() => signOut()}>sign out</div>
                     </ChatHeader>
 
                     <ChatContent>

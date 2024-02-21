@@ -46,6 +46,11 @@ class WsManager extends EventTarget {
         this.ws.addEventListener('message', this.onMessage.bind(this))
     }
 
+    disconnect() {
+        this.ws?.close();
+        this._open = false;
+    }
+
     send(data: Message | Buffer) {
         let message: Buffer, m: Message | null;
         if (data instanceof Message) {

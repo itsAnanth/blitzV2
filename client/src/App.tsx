@@ -29,6 +29,7 @@ function App() {
 						<Route path='/signup' element={<Landing type={LandingTypes.SIGNUP} />} />
 						<Route path='/signin' element={<Landing type={LandingTypes.SIGNIN} />} />
 						<Route path='/chat' element={<Chat />} />
+						<Route path='/test' element={<Test />} />
 					</Routes>
 				</LoaderProvider>
 			</FireBaseProvider>

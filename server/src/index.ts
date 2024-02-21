@@ -3,8 +3,8 @@ import HttpServer from "./structures/HttpServer";
 import WsServer from "./structures/WsServer";
 import { config } from "dotenv";
 import Logger from "./utils/Logger";
+import { app, db } from "./database/Firebase";
 
-config();
 
 
 // import db from "./database/Main";
@@ -31,9 +31,7 @@ declare module 'websocket' {
 
     await wsServer.init();
 
-    console.log(">>>>", wsServer)
-
-    wsServer.channels.set('123456', new Channel({ id: '123456', name: 'main' }));
+    wsServer.channels.set('12345', new Channel({ id: '12345', name: 'main' }));
 
     // for (let i = 0; i < 5; i++) {
     //     let temp = new Channel({ id: getChannelId(), name: 'general' });

@@ -6,6 +6,7 @@ import { LandingTypes } from '../../utils/LandingTypes';
 import { FireBaseContext } from '../../contexts/firebase.context';
 import { LoaderContext } from '../../contexts/loader.context';
 import { getPersistence, setPersistence } from '../../utils';
+import { PersistenceType } from '../../utils/setPersistence';
 function Landing({ type }: any) {
 
     const loaderContext = useContext(LoaderContext);
@@ -27,7 +28,9 @@ function Landing({ type }: any) {
 
         if (user.error) return setError(user.detail.split("/")[1].split("-").join(" "));
 
-        setPersistence(ev.target.checkbox.checked ? true : false);
+        console.log("?>>>>>>>>>>>>>>>", ev.target.checkbox.checked)
+
+        setPersistence(ev.target.checkbox.checked ? PersistenceType.REMEMBER_USER : PersistenceType.FORGET_USER);
 
     }
 
@@ -108,7 +111,8 @@ function Landing({ type }: any) {
                                         type="checkbox"
                                         value={"checkbox"}
                                         name='checkbox'
-                                        checked={getPersistence()}
+                                        defaultChecked={getPersistence() === PersistenceType.REMEMBER_USER ? true : false}
+                                        // checked={getPersistence()}
                                     />
                                 </CheckBoxLabel>
 

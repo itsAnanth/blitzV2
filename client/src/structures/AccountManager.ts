@@ -1,7 +1,14 @@
-import { getAuth, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, updateProfile, browserLocalPersistence, inMemoryPersistence } from 'firebase/auth';
 import type { Auth } from 'firebase/auth';
+import { PersistenceType } from '../utils/setPersistence';
 
 class AccountManager {
+
+    static setPersistence(val: PersistenceType) {
+        const auth = getAuth();
+
+        auth.setPersistence(val === PersistenceType.REMEMBER_USER ? browserLocalPersistence : inMemoryPersistence)
+    }
 
     static async update(username: string) {
         const auth: Auth = getAuth();
@@ -61,6 +68,7 @@ class AccountManager {
     }
 
     static async signOut() {
+        console.log("signout called")
         const auth: Auth = getAuth();
         try {
             await signOut(auth);

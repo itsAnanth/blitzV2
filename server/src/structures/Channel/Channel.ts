@@ -11,9 +11,9 @@ class Channel {
     _lastUpdate: number;
     _cacheFlush: number;
 
-    constructor({ id, name }: { name: string, id: string }) {
+    constructor({ id, name, users }: { name: string, id: string, users?: string[] }) {
         this.id = id;
-        this.users = [];
+        this.users = users ?? [];
         this.name = name;
     }
 
@@ -51,10 +51,14 @@ class Channel {
         }
     }
 
-    serialize() {
+    serialize(users: WsServer['users']) {
+        console.log("server users", this.users)
+        console.log("serialize self users", this.users)
+        console.log("serialize", this.getUsers(users))
         return {
             name: this.name,
-            id: this.id
+            id: this.id,
+            users: this.getUsers(users)
         }
     }
 }
