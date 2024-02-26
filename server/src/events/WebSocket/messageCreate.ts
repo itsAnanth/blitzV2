@@ -1,4 +1,6 @@
+import ChatMessage from "../../../../shared/ChatMessage/ChatMessage";
 import Message, { DataTypes } from "../../../../shared/Message";
+import Db from "../../database/Db";
 // import db from "../../database/Main";
 import WsEvent from "../../structures/Events/WsEvent";
 import { getMessageId } from "../../utils";
@@ -15,10 +17,18 @@ export default new WsEvent<DataTypes.Client.MESSAGE_CREATE>({
 
         if (!room) return console.error('no active room');
 
+        const messageData: ChatMessage = {
+            messageId: getMessageId(),
+            author: _message.data[0].author,
+            timestamp: Date.now(),
+            recipient: _message.data[0].recipient,
+            content: _message.data[0].content
+        }
+
 
         const message = new Message<DataTypes.Server.MESSAGE_CREATE>({
             type: Message.types.MESSAGE_CREATE,
-            data: [{ ...(_message.data[0]), messageId: getMessageId(), authorId: user.id, authorUsername: user.username, timestamp: Date.now(), avatar: user.avatar }]
+            data: [{ ...(messageData) }]
         });
 
         console.log(`Message Length ${message.encode().length}`);

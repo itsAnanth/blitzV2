@@ -29,7 +29,7 @@ export default new WsEvent<DataTypes.Client.JOIN_CHANNEL>({
 
         channel.broadCast(this.users, new Message<DataTypes.Server.MESSAGE_CREATE>({
             type: Message.types.MESSAGE_CREATE,
-            data: [{ content: `${user.username} has joined the chat!`, recipient: '', authorUsername: 'Blitz Bot', authorId: 'bot', 'messageId': getMessageId(), timestamp: Date.now(), avatar: 0 }]
+            data: [{ content: `${user.username} has joined the chat!`, recipient: '12345', author: 'bot', 'messageId': getMessageId(), timestamp: Date.now()}]
         }));
 
         // ws.send(new Message({

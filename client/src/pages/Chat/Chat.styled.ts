@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 export const ChatDiv = styled.div`
     width: 100vw;
@@ -6,6 +6,7 @@ export const ChatDiv = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
 `;
 
 export const ChatContainer = styled.div`
@@ -48,15 +49,15 @@ export const ChatContent = styled.div`
 
 `;
 
-export const ChatSidebar = styled.div`
+export const ChatSidebar = styled.div<{ width?: number }>`
     /* flex: 20%; */
-    max-width: 20%;
-    width: 15%;
+    /* max-width: 20%; */
+    width: ${({ width = 15 }) => width}%;
     background-color: ${({ theme }) => theme.tertiary};
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
-    scrollbar-gutter: stable both-edges;
+    scrollbar-gutter: stable;
 
     ::-webkit-scrollbar {
         display: none;
@@ -141,8 +142,8 @@ export const ChatMessage = styled.div`
 `;
 
 export const ChatMessageAvatar = styled.img`
-    width: 3rem;
-    height: 3rem;
+    width: 40px;
+    height: 40px;
     margin: 0.7rem 1rem;
     object-fit: cover;
     margin-right: 1rem;
@@ -160,7 +161,7 @@ export const ChatMessageMetaWrapper = styled.div`
 `;
 
 export const ChatMessageMeta = styled.div`
-    padding: 0.5rem 0;
+    padding: 0.2rem 0;
     display: flex;
     align-items: center;
 `;
@@ -185,6 +186,7 @@ export const MetaTimestamp = styled.div`
 export const ChatMessageContent = styled.div`
     /* background-color: blue; */
     color: ${({ theme }) => theme.text};
+    font-size: 0.9rem;
     padding: 1rem 0;
     padding-right: 1rem;
     word-break: break-word;
@@ -212,11 +214,11 @@ export const ChatMainForm = styled.div`
     /* flex: 20%; */
 
     form {
-        height: 100%;
+        height: 80%;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 100%;
+        width: 95%;
     }
     input {
         resize: none;
@@ -235,12 +237,51 @@ export const ChatMainFormSend = styled.button`
     outline: none;
     border: none;
     background-color: transparent;
-    height: 100%;
+    height: 70%;
     font-size: 2rem;
     color: ${({ theme }) => theme.text};
     display: flex;
     align-items: center;
     justify-content: center;
+`;
+
+export const ChatMainFormUploadBtn = styled.div`
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+`
+
+
+export const ChannelsContainer = styled.div`
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    margin: 5px 0;
+    scrollbar-gutter: stable;
+
+`
+
+export const ChannelDiv = styled.div`
+    margin: 1rem 1rem 0 0.5rem;
+    max-height: 70px;
+    display: flex;
+    color: white;
+    justify-content: space-around;
+    width: 95%;
+    height: 100%;
+    align-items: center;
+    padding: 1rem 1rem;
+
+    :hover {
+        cursor: pointer;
+        background-color: ${({ theme }) => theme.lightbg};
+    }
 `;
 
 export const UsersContainer = styled.div`
@@ -254,7 +295,7 @@ export const UsersContainer = styled.div`
 `
 
 export const User = styled.div`
-    margin-top: 1rem;
+    margin: 1rem 1rem 0 0.5rem;
     max-height: 70px;
     display: flex;
     width: 95%;
@@ -268,8 +309,8 @@ export const User = styled.div`
 `;
 
 export const UserAvatar = styled.img`
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
 `;
 
@@ -278,7 +319,90 @@ export const UserDetail = styled.div`
     align-items: center;
     padding-left: 1rem;
     color: ${({ theme }) => theme.text};
+    font-size: 0.9rem;
     font-weight: 400;
     height: 100%;
     width: 100%;
 `;
+
+export const LogoutDiv = styled.div`
+
+    color: ${({ theme }) => theme.text};
+    font-size: 2rem;
+    padding-right: 2rem;
+
+    :hover {
+        transform: scale(1.2);
+        cursor: pointer;
+    }
+`
+
+export const ChannelDialogContainer = styled.div<{ width?: number, height?: number }>`
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: ${({ width = 100 }) => width}%;
+    height: ${({ height = 100 }) => height}%;
+
+    /* width: ${props => props.className?.includes('inactive') ? 0 : 100}%; */
+    /* height: ${props => props.className?.includes('inactive') ? 0 : 100}%; */
+    background-color: red;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(32, 34, 37, ${({ width = 100 }) => width === 100 ? 0.8 : 0});
+
+    /* background-color: rgba(32, 34, 37, 0.6); */
+
+
+
+
+
+`
+
+const dialogAnimationOpen = keyframes`
+    0% {
+        z-index: 99;
+        width: 0;
+        height: 0;
+    }
+
+    100% {
+        width: 30%;
+        height: 70%;
+    }
+`
+
+const dialogAnimationClose = keyframes`
+    0% {
+        width: 30%;
+        height: 70%;
+    }
+
+    100% {
+        width: 0;
+        height: 0;
+        z-index: -1;
+    }
+`
+
+export const ChannelDialog = styled.div<{ width?: number, height?: number, show: boolean }>`
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    z-index: -1;
+    /* max-width: 30%; */
+    /* width: 400px;
+    height: 70%; */
+    /* width: ${({ width = 100 }) => width}%;
+    height: ${({ height = 100 }) => height}%; */
+    background-color: blue;
+    /* visibility: ${({ show }) => show ? 'visible': 'hidden'}; */
+    animation: ${({ show }) => show ? dialogAnimationOpen : dialogAnimationClose} 0.8s forwards;
+`
+
+export const ChannelDialogHeading = styled.div`
+
+`

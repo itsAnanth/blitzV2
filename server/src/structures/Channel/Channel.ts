@@ -1,4 +1,7 @@
-import Message from "../../../../shared/Message";
+import { Console } from "console";
+import ChatMessage from "../../../../shared/ChatMessage/ChatMessage";
+import Message, { DataTypes } from "../../../../shared/Message";
+import Db from "../../database/Db";
 import User from "../User/User";
 import WsServer from "../WsServer";
 
@@ -48,6 +51,10 @@ class Channel {
 
             user.socket.send(message.encode());
 
+        }
+
+        if (message.type === Message.types.MESSAGE_CREATE) {
+            Db.setMessage(this.id, message.data[0])
         }
     }
 

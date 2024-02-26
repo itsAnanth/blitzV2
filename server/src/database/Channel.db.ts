@@ -1,3 +1,0 @@
-// interface IChannel {
-//     messages: Datat
-// }

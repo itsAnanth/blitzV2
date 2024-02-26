@@ -3,7 +3,9 @@ import HttpServer from "./structures/HttpServer";
 import WsServer from "./structures/WsServer";
 import { config } from "dotenv";
 import Logger from "./utils/Logger";
-import { app, db } from "./database/Firebase";
+import { app, db, rdb } from "./database/Firebase";
+import { push, set, ref, query, onValue, child, limitToFirst, get } from "firebase/database";
+import { getMessageId } from "./utils";
 
 
 
@@ -12,8 +14,26 @@ import { app, db } from "./database/Firebase";
 const httpServer = new HttpServer(3000);
 Logger.DEV = true;
 
+const postListRef = ref(rdb, 'messages' + '/12345');
+// const pushref = push(postListRef);
 
 
+
+// onValue(postListRef, (snapshot) => {
+//     snapshot.forEach((childSnapshot) => {
+//         const childKey = childSnapshot.key;
+//         const childData = childSnapshot.val();
+
+
+//         console.log(childKey, childData)
+//     });
+// }, {
+//     onlyOnce: true
+// });
+
+// get(query(postListRef, limitToFirst(10))).then(v => {
+//     v.forEach(s => console.log("q", s.val()))
+//     console.log("queryyyy") })
 
 
 declare module 'websocket' {

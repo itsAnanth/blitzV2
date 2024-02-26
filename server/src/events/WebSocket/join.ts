@@ -9,18 +9,22 @@ export default new WsEvent<DataTypes.Client.USER_JOIN>({
 
         ws.id = data.userId;
 
-        const user = new ServerUser({
-            username: data.username,
-            id: data.userId,
-            avatar: data.avatar,
-            socket: ws
-        });
+        if (!this.users.has(data.userId)) {
 
-        this.users.set(ws.id, user);
+            const user = new ServerUser({
+                username: data.username,
+                id: data.userId,
+                avatar: data.avatar,
+                socket: ws
+            });
+            this.users.set(ws.id, user);
+
+        }
+
 
         ws.send(new Message({
             type: Message.types.USER_JOIN,
-            data: [{ status: 'authenticated'}]
+            data: [{ status: 'authenticated' }]
         }).encode())
 
         console.log('current users', [...this.users.keys()]);

@@ -1,3 +1,4 @@
 import crypto from 'crypto';
+import { uuid } from 'uuidv4';
 
-export const getMessageId = () => `m_${crypto.randomBytes(8).toString('hex')}`;
+export const getMessageId = () => `m_${uuid()}`;

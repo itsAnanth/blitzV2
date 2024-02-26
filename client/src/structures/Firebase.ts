@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from 'firebase/firestore';
+import { getDatabase } from "firebase/database";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 // Your web app's Firebase configuration
@@ -11,6 +12,7 @@ const firebaseConfig = {
     authDomain: "blitzappv1.firebaseapp.com",
     projectId: "blitzappv1",
     storageBucket: "blitzappv1.appspot.com",
+    databaseURL: "https://blitzappv1-default-rtdb.asia-southeast1.firebasedatabase.app",
     messagingSenderId: "245689724814",
     appId: "1:245689724814:web:cb42ab432716d16de87edf",
     measurementId: "G-197ZK5TQZK"
@@ -21,5 +23,6 @@ const app = initializeApp(firebaseConfig);
 // const analytics = getAnalytics(app);
 
 const db = getFirestore(app);
+const rdb = getDatabase(app);
 
-export { app, db };
+export { app, db, rdb };

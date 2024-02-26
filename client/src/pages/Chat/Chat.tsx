@@ -1,14 +1,16 @@
-import { ChatContainer, ChatContent, ChatDiv, ChatHeader, ChatHeaderBrand, ChatMain, ChatMainContent, ChatMainForm, ChatMainFormSend, ChatSidebar, ChatSidebarContainer, ChatSidebarContent, User, UserAvatar, UserDetail, UsersContainer } from "./Chat.styled";
+import { ChannelDialog, ChannelDialogContainer, ChannelDiv, ChannelsContainer, ChatContainer, ChatContent, ChatDiv, ChatHeader, ChatHeaderBrand, ChatMain, ChatMainContent, ChatMainForm, ChatMainFormSend, ChatMainFormUploadBtn, ChatSidebar, ChatSidebarContainer, ChatSidebarContent, LogoutDiv, User, UserAvatar, UserDetail, UsersContainer } from "./Chat.styled";
 import { ChatMessage } from "../../components";
 import { AiOutlineSend } from 'react-icons/ai';
 import { useContext, useState, useEffect, useRef } from "react";
 import { WebSocketContext } from "../../contexts/websocket.context";
 import Message, { DataTypes } from "../../../../shared/Message";
-import { isCustomEvent } from "../../utils";
+import { Logger, isCustomEvent } from "../../utils";
 import { useNavigate } from "react-router-dom";
 import { FireBaseContext } from "../../contexts/firebase.context";
 import { LoaderContext } from "../../contexts/loader.context";
+import { CiLogout, CiCirclePlus } from 'react-icons/ci'
 import AccountManager from "../../structures/AccountManager";
+import Db from "../../structures/Db";
 
 function Chat() {
     const authContext = useContext(FireBaseContext);
@@ -24,6 +26,7 @@ function Chat() {
     const [channels, setChannels] = useState<DataTypes.Server.GET_CHANNELS>([]);
     const [users, setUsers] = useState<({ username: string, avatar: number, id: string })[]>([]);
     const loaderContext = useContext(LoaderContext);
+    const [channelDialog, setChannelDialog] = useState(false)
 
     const [currentChannel, setCurrentChannel] = useState<string | null>(null);
     // useEffect(() => {
@@ -37,8 +40,16 @@ function Chat() {
         initChat();
 
         console.log(users, 'users');
-        loaderContext.setLoader(false);
+        // loaderContext.setLoader(false);
 
+        // console.log("db messages", Db.getMessages('12345').then(console.log))
+
+
+        (async function () {
+            // setMessage([]);
+
+
+        })()
 
     }, []);
 
@@ -52,7 +63,7 @@ function Chat() {
 
     useEffect(() => {
         chatMainRef.current?.scrollTo({ 'top': chatMainRef.current.scrollHeight });
-    });
+    }, [message]);
 
     useEffect(() => {
 
@@ -65,6 +76,7 @@ function Chat() {
 
             setMessage([...message, data[0]]);
 
+
         });
     }, [message]);
 
@@ -76,6 +88,8 @@ function Chat() {
         console.log(users, 'GETUSERS');
 
     }
+
+
 
 
     function initChat() {
@@ -96,23 +110,9 @@ function Chat() {
 
         // })
 
-        if (!wsm._open) {
-            wsm.connect();
-
-        }
 
 
-        wsm.addEventListener('wsopen', () => {
-            user = authContext.user;
-
-            console.log('ws open');
-
-            wsm.send(new Message<DataTypes.Client.USER_JOIN>({
-                type: Message.types.USER_JOIN,
-                // @ts-ignore
-                data: [{ username: user.displayName || 'unknown user', userId: user.uid, avatar: Math.floor(Math.random() * 50) }]
-            }))
-        });
+        wsm.addEventListener('wsopen', userJoin);
 
 
 
@@ -120,15 +120,26 @@ function Chat() {
         wsm.addEventListener(Message.types[Message.types.JOIN_CHANNEL], joinChannelEvent)
 
         wsm.addEventListener(Message.types[Message.types.USER_JOIN], userJoinEvent);
+
+        if (!wsm._open) {
+            wsm.connect();
+
+        }
     }
 
-    const joinChannelEvent = (ev: any) => {
+    const joinChannelEvent = async (ev: any) => {
         if (!isCustomEvent(ev)) return;
 
         const msg: DataTypes.Server.JOIN_CHANNEL = ev.detail;
         console.log('JOIN CHANNLE', msg)
 
         setUsers(msg);
+
+        const data = await Db.getMessages('12345');
+
+        console.log("getting data from db", data)
+        setMessage([...message, ...data])
+        loaderContext.setLoader(false)
 
         // getUsers();
     }
@@ -146,6 +157,8 @@ function Chat() {
     const sendMessage = (ev: React.FormEvent<HTMLFormElement>) => {
         ev.preventDefault();
 
+        if (!authContext.user) return Logger.error('user undefined on send message');
+
         if (!currentChannel) return console.error('Invalid current channel');
         const target: any = ev.target;
 
@@ -153,11 +166,23 @@ function Chat() {
         wsm.send(
             new Message<DataTypes.Client.MESSAGE_CREATE>({
                 type: Message.types.MESSAGE_CREATE,
-                data: [{ content: target.message.value, recipient: currentChannel }]
+                data: [{ content: target.message.value, recipient: currentChannel, author: authContext.user?.uid }]
             }).encode()
         )
 
         target.message.value = '';
+    }
+
+    const userJoin = () => {
+        user = authContext.user;
+
+        console.log('ws open');
+
+        wsm.send(new Message<DataTypes.Client.USER_JOIN>({
+            type: Message.types.USER_JOIN,
+            // @ts-ignore
+            data: [{ username: user.displayName || 'unknown user', userId: user.uid, avatar: Math.floor(Math.random() * 50) }]
+        }))
     }
 
     const signOut = () => {
@@ -166,9 +191,14 @@ function Chat() {
         setUsers([]);
         setMessage([]);
 
+        wsm.removeEventListener('wsopen', userJoin);
         wsm.removeEventListener(Message.types[Message.types.JOIN_CHANNEL], joinChannelEvent);
-        wsm.removeEventListener(Message.types[Message.types.JOIN_CHANNEL], userJoinEvent);
+        wsm.removeEventListener(Message.types[Message.types.USER_JOIN], userJoinEvent);
 
+    }
+
+    const handleChannelDialog = (status: boolean) => {
+        setChannelDialog(status)
     }
 
 
@@ -187,24 +217,35 @@ function Chat() {
         <>
             {/* <Loader active={loaderActive} /> */}
             {/* {user ? */}
+            <ChannelDialogContainer
+                width={channelDialog ? 100 : 0}
+                height={channelDialog ? 100 : 0}
+            >
+                <ChannelDialog
+                    show={channelDialog}
+                    width={channelDialog ? 30 : 0}
+                    height={channelDialog ? 70 : 0}
+                ><div onClick={() => handleChannelDialog(false)}>close</div></ChannelDialog>
+            </ChannelDialogContainer>
             <ChatDiv>
                 <ChatContainer>
                     <ChatHeader>
                         <ChatHeaderBrand>Blitz App</ChatHeaderBrand>
-                        <div onClick={() => signOut()}>sign out</div>
+                        <LogoutDiv onClick={() => signOut()}>
+                            <CiLogout />
+                        </LogoutDiv>
                     </ChatHeader>
 
                     <ChatContent>
-                        <ChatSidebar>
+                        <ChatSidebar width={18}>
+                            <ChannelsContainer>
+                                <ChannelDiv onClick={() => handleChannelDialog(true)}>
+                                    <CiCirclePlus style={{ fontSize: '1.5rem' }} />
+                                    Create Channel
+                                </ChannelDiv>
+                            </ChannelsContainer>
 
-                            <UsersContainer>{
-                                users.map(user => {
-                                    return (
-                                        <User><UserAvatar src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.avatar}`}></UserAvatar><UserDetail>{user.username}</UserDetail></User>
-                                    )
-                                })
-                            }
-                            </UsersContainer>
+
                             {/* {channels.map((item, i) =>
                                     <ChatSidebarContainer
                                         key={i}
@@ -217,8 +258,8 @@ function Chat() {
                             <ChatMainContent ref={chatMainRef}>
                                 {message.map((item, i) => (
                                     <ChatMessage
-                                        avatar={item.avatar}
-                                        author={item.authorUsername}
+                                        avatar={0}
+                                        author={item.author}
                                         content={item.content}
                                         timestamp={new Date(Date.now()).toLocaleDateString()}
                                         key={i}
@@ -228,6 +269,10 @@ function Chat() {
                             <ChatMainForm ref={formContainerRef}>
 
                                 <form onSubmit={sendMessage}>
+                                    <ChatMainFormUploadBtn>
+                                        <CiCirclePlus />
+                                    </ChatMainFormUploadBtn>
+
                                     <input
                                         ref={textRef}
                                         placeholder="Message"
@@ -238,6 +283,17 @@ function Chat() {
                                 </form>
                             </ChatMainForm>
                         </ChatMain>
+                        <ChatSidebar width={22}>
+
+                            <UsersContainer>{
+                                users.map(user => {
+                                    return (
+                                        <User><UserAvatar src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.avatar}`}></UserAvatar><UserDetail>{user.username}</UserDetail></User>
+                                    )
+                                })
+                            }
+                            </UsersContainer>
+                        </ChatSidebar>
                     </ChatContent>
                 </ChatContainer>
             </ChatDiv>

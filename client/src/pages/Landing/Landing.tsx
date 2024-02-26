@@ -82,7 +82,10 @@ function Landing({ type }: any) {
                                     name="email"
                                     id="email"
                                     placeholder="Email"
-                                    autoComplete='on'
+                                    autoComplete='off'
+                                    autoCapitalize='none'
+                                    autoCorrect='off'
+                                    maxLength={999}
                                     required
                                 />
                             </InputContainer>

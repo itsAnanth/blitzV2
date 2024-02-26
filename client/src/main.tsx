@@ -9,10 +9,6 @@ import WebSocketProvider from './contexts/websocket.context';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	<Provider store={store}>
-		<WebSocketProvider>
-			<BrowserRouter>
-				<App />
-			</BrowserRouter>
-		</WebSocketProvider>
+		<App />
 	</Provider>
 )

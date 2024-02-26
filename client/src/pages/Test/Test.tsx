@@ -20,23 +20,23 @@ function Test() {
 
     })
 
+    
+    // useEffect(() => {
+    //     const userId = firebaseContext.user?.uid as string;
+    //     // setDoc(doc(firebaseContext.db, 'test_users', userId), {
+    //     //     channels: ['12345']
+    //     // })
+    //     wsContext.connect();
 
-    useEffect(() => {
-        const userId = firebaseContext.user?.uid as string;
-        // setDoc(doc(firebaseContext.db, 'test_users', userId), {
-        //     channels: ['12345']
-        // })
-        wsContext.connect();
-
-        wsContext.addEventListener('wsopen', () => {
-            wsContext.send(new Message({
-                type: Message.types.GET_CHANNEL,
-                data: ['12345']
-            }))
-        })
-    }, [])
+    //     wsContext.addEventListener('wsopen', () => {
+    //         wsContext.send(new Message({
+    //             type: Message.types.GET_CHANNEL,
+    //             data: ['12345']
+    //         }))
+    //     })
+    // }, [])
     return (
-        <div>sreedev</div>
+        <div>{firebaseContext.user?.displayName}</div>
     )
 
 }

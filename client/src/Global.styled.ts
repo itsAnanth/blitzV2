@@ -6,6 +6,9 @@ export const GlobalStyles = createGlobalStyle`
 	--primary: ${({ theme }) => theme.primary};
 	--secondary: white;
 
+	overflow: auto;
+	/* scrollbar-gutter: stable; */
+
 }
 * {
 	font-family: 'Montserrat', sans-serif;

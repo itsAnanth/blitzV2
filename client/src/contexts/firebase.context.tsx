@@ -20,7 +20,6 @@ const FireBaseProvider = ({ children }: any) => {
         console.log(firebaseUser);
         const auth = getAuth(app);
         const rememberme = getPersistence();
-        console.log("????????????remember", rememberme)
         auth.setPersistence(rememberme === PersistenceType.REMEMBER_USER ? browserLocalPersistence : inMemoryPersistence)
         const unsub = auth.onAuthStateChanged((user) => {
             console.log('state change', user);
