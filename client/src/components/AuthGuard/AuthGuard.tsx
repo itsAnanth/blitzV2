@@ -23,8 +23,10 @@ function AuthGuard({ children }: any) {
         setState(true);
     }, [user]);
 
+
+
     return (
-        <Loader active={loaderContext.loader}>
+        <Loader active={loaderContext.loader} text={loaderContext.loaderText}>
             {state && children}
         </Loader>
     )

@@ -12,7 +12,8 @@ enum MessageTypes {
     LEAVE_CHANNEL,
     CREATE_CHANNEL,
     GET_CHANNEL,
-    GET_CHANNELS
+    GET_CHANNELS,
+    SET_ACTIVE_CHANNEL
 };
 
 export default MessageTypes

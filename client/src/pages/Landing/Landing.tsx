@@ -7,6 +7,7 @@ import { FireBaseContext } from '../../contexts/firebase.context';
 import { LoaderContext } from '../../contexts/loader.context';
 import { getPersistence, setPersistence } from '../../utils';
 import { PersistenceType } from '../../utils/setPersistence';
+import Db from '../../structures/Db';
 function Landing({ type }: any) {
 
     const loaderContext = useContext(LoaderContext);
@@ -28,7 +29,8 @@ function Landing({ type }: any) {
 
         if (user.error) return setError(user.detail.split("/")[1].split("-").join(" "));
 
-        console.log("?>>>>>>>>>>>>>>>", ev.target.checkbox.checked)
+
+
 
         setPersistence(ev.target.checkbox.checked ? PersistenceType.REMEMBER_USER : PersistenceType.FORGET_USER);
 
@@ -45,7 +47,13 @@ function Landing({ type }: any) {
     useEffect(() => {
         console.log(authContext.user, 'landing state changed');
 
-        if (authContext.user) navigate('/chat')
+        if (authContext.user) {
+            // loaderContext.setLoader(true);
+            // loaderContext.setLoaderText("Creating User Data...");
+    
+            Db.setUser(authContext.user);
+            navigate('/chat')
+        }
         // if (authContext.user) navigate('/chat')
     }, [authContext.user])
 

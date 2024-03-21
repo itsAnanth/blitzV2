@@ -6,10 +6,7 @@ import Logger from "./utils/Logger";
 import { app, db, rdb } from "./database/Firebase";
 import { push, set, ref, query, onValue, child, limitToFirst, get } from "firebase/database";
 import { getMessageId } from "./utils";
-
-
-
-// import db from "./database/Main";
+import Db from "./database/Db";
 
 const httpServer = new HttpServer(3000);
 Logger.DEV = true;
@@ -18,6 +15,8 @@ const postListRef = ref(rdb, 'messages' + '/12345');
 // const pushref = push(postListRef);
 
 
+
+// Db.getMessageById('12345');
 
 // onValue(postListRef, (snapshot) => {
 //     snapshot.forEach((childSnapshot) => {
@@ -42,7 +41,10 @@ declare module 'websocket' {
     }
 }
 
-(async function () {
+// Db.getMessageById("12345")
+
+// @ts-ignore
+!process.argv.includes('noserver') && (async function () {
     await httpServer.init();
     httpServer.start();
 

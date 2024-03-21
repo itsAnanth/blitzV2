@@ -22,11 +22,20 @@ $tiles: 5;
         transform: translateX(-50%) translateY(-50%);
         opacity: 0;
         transition: opacity .5s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
 
         svg {
 
             transform-origin: 0 0;
         }
+    }
+
+    #{$parent}__text {
+        padding-top: 1rem;
+        color: white
     }
 
     #{$parent}__tile {

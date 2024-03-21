@@ -44,6 +44,8 @@ class AccountManager {
             return { error: true, detail: (e as any).code };
         }
 
+    
+
         const user = result.user;
 
         return { error: false, detail: user };

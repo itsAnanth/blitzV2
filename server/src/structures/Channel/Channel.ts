@@ -68,6 +68,14 @@ class Channel {
             users: this.getUsers(users)
         }
     }
+
+    serializeDb(): { name: string, id: string, users: any[] } {
+        return {
+            name: this.name,
+            id: this.id,
+            users: []
+        }
+    }
 }
 
 export default Channel;

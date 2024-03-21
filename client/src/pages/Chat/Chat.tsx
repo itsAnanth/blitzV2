@@ -1,4 +1,4 @@
-import { ChannelDialog, ChannelDialogContainer, ChannelDiv, ChannelsContainer, ChatContainer, ChatContent, ChatDiv, ChatHeader, ChatHeaderBrand, ChatMain, ChatMainContent, ChatMainForm, ChatMainFormSend, ChatMainFormUploadBtn, ChatSidebar, ChatSidebarContainer, ChatSidebarContent, LogoutDiv, User, UserAvatar, UserDetail, UsersContainer } from "./Chat.styled";
+import { ChannelDiv, ChannelsContainer, ChatContainer, ChatContent, ChatDiv, ChatHeader, ChatHeaderBrand, ChatMain, ChatMainContent, ChatMainForm, ChatMainFormSend, ChatMainFormUploadBtn, ChatSidebar, ChatSidebarContainer, ChatSidebarContent, LogoutDiv, User, UserAvatar, UserDetail, UsersContainer } from "./Chat.styled";
 import { ChatMessage } from "../../components";
 import { AiOutlineSend } from 'react-icons/ai';
 import { useContext, useState, useEffect, useRef } from "react";
@@ -11,6 +11,7 @@ import { LoaderContext } from "../../contexts/loader.context";
 import { CiLogout, CiCirclePlus } from 'react-icons/ci'
 import AccountManager from "../../structures/AccountManager";
 import Db from "../../structures/Db";
+import ChannelCreate from "./ChannelCreate/ChannelCreate";
 
 function Chat() {
     const authContext = useContext(FireBaseContext);
@@ -29,27 +30,10 @@ function Chat() {
     const [channelDialog, setChannelDialog] = useState(false)
 
     const [currentChannel, setCurrentChannel] = useState<string | null>(null);
-    // useEffect(() => {
-    //     fetch('http://localhost:3000/channels')
-    //         .then(res => res.json())
-    //         .then(val => setChannels(val));
-    // }, [])
 
     useEffect(() => {
 
         initChat();
-
-        console.log(users, 'users');
-        // loaderContext.setLoader(false);
-
-        // console.log("db messages", Db.getMessages('12345').then(console.log))
-
-
-        (async function () {
-            // setMessage([]);
-
-
-        })()
 
     }, []);
 
@@ -67,7 +51,7 @@ function Chat() {
 
     useEffect(() => {
 
-        wsm.addEventListener(Message.types[Message.types.MESSAGE_CREATE], ev => {
+        const messageCreate = (ev: any) => {
             if (!isCustomEvent(ev)) return;
 
 
@@ -77,7 +61,11 @@ function Chat() {
             setMessage([...message, data[0]]);
 
 
-        });
+        }
+
+        wsm.addEventListener(Message.types[Message.types.MESSAGE_CREATE], messageCreate);
+
+        return () => wsm.removeEventListener(Message.types[Message.types.MESSAGE_CREATE], messageCreate);
     }, [message]);
 
     async function getUsers() {
@@ -130,16 +118,20 @@ function Chat() {
     const joinChannelEvent = async (ev: any) => {
         if (!isCustomEvent(ev)) return;
 
+        loaderContext.setLoaderText("Fetching Messages...")
+
         const msg: DataTypes.Server.JOIN_CHANNEL = ev.detail;
         console.log('JOIN CHANNLE', msg)
 
         setUsers(msg);
 
-        const data = await Db.getMessages('12345');
-
+        // const data: any[] = await (await fetch('http://localhost:3000/messages?channelId=12345')).json() //Db.getMessages('12345');
+        const data = await Db.getMessages('12345')
         console.log("getting data from db", data)
         setMessage([...message, ...data])
         loaderContext.setLoader(false)
+
+        loaderContext.setLoaderText("")
 
         // getUsers();
     }
@@ -197,9 +189,6 @@ function Chat() {
 
     }
 
-    const handleChannelDialog = (status: boolean) => {
-        setChannelDialog(status)
-    }
 
 
     // const joinChannel = (i: number) => {
@@ -217,16 +206,8 @@ function Chat() {
         <>
             {/* <Loader active={loaderActive} /> */}
             {/* {user ? */}
-            <ChannelDialogContainer
-                width={channelDialog ? 100 : 0}
-                height={channelDialog ? 100 : 0}
-            >
-                <ChannelDialog
-                    show={channelDialog}
-                    width={channelDialog ? 30 : 0}
-                    height={channelDialog ? 70 : 0}
-                ><div onClick={() => handleChannelDialog(false)}>close</div></ChannelDialog>
-            </ChannelDialogContainer>
+            <ChannelCreate channelDialog={channelDialog} setChannelDialog={setChannelDialog} />
+            
             <ChatDiv>
                 <ChatContainer>
                     <ChatHeader>
@@ -239,7 +220,7 @@ function Chat() {
                     <ChatContent>
                         <ChatSidebar width={18}>
                             <ChannelsContainer>
-                                <ChannelDiv onClick={() => handleChannelDialog(true)}>
+                                <ChannelDiv onClick={() => setChannelDialog(true)}>
                                     <CiCirclePlus style={{ fontSize: '1.5rem' }} />
                                     Create Channel
                                 </ChannelDiv>

@@ -2,7 +2,7 @@ import { useTheme } from 'styled-components';
 import './Loader.scss';
 import React, { useRef, useEffect } from 'react';
 
-function Loader({ active, children }: any) {
+function Loader({ active, children, text }: any) {
     const theme = useTheme();
 
 
@@ -26,6 +26,7 @@ function Loader({ active, children }: any) {
                                 repeatCount="indefinite" />
                         </path>
                     </svg>
+                    <div className='loader__text'>{text}</div>
                 </div>
                 <div className="loader__tile"></div>
                 <div className="loader__tile"></div>

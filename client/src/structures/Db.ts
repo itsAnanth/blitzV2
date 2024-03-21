@@ -1,6 +1,7 @@
 import { rdb } from './Firebase';
 import ChatMessage from '../../../shared/ChatMessage/ChatMessage';
 import { set, get, limitToFirst, query, ref, push, limitToLast } from 'firebase/database';
+import { User } from 'firebase/auth';
 class Db {
 
     static async setMessage(channelId: string, message: ChatMessage) {
@@ -22,6 +23,21 @@ class Db {
         })
 
         return dataArray;
+    }
+
+    static async setUser(user: User) {
+        const userData: { userId: string, channels: string[], photoURL: string } = {
+            userId: user.uid,
+            channels: [],
+            photoURL: ''
+        }
+
+
+        const reference = ref(rdb, `users/${userData.userId}`);
+
+        await set(reference, userData);
+
+        // const listRef = ref(rdb, `users/${userid}`)
     }
 }
 

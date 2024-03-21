@@ -17,7 +17,7 @@ export namespace DataTypes {
         export type CONNECT = [{ username: string }];
         export type JOIN_CHANNEL = [{ channelId: string }];
         export type MESSAGE_CREATE = [{ content: string, recipient: string, author: string }];
-        export type CREATE_CHANNEL = [{ channelName: string }];
+        export type CREATE_CHANNEL = [{ channelName: string, owner: string }];
         export type SET_ACTIVE_CHANNEL = [{ channelId: string }];
     }
 }
