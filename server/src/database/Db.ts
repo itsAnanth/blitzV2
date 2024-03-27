@@ -62,7 +62,7 @@ class Db {
         //     // console.log(snap.key)
         //     console.log(Object.values(snap.val()))
         // })
-        // const snapshot = await get(query(reference, orderByChild('messageId'), equalTo('m_ede59c1d-e125-4f1d-89f4-21da8fbe44d5')));
+        const snapshot = await get(query(reference, orderByChild('messageId'), equalTo('m_ede59c1d-e125-4f1d-89f4-21da8fbe44d5')));
         // const dataArray: ChatMessage[] = [];
         // console.log(snapshot.size)
         // const dat: any[] = [];

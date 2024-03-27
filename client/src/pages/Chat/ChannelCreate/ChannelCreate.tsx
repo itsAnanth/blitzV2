@@ -6,6 +6,8 @@ import { FireBaseContext } from '../../../contexts/firebase.context';
 import { WebSocketContext } from '../../../contexts/websocket.context';
 import { LoaderContext } from '../../../contexts/loader.context';
 import { isCustomEvent } from '../../../utils';
+import Db from '../../../structures/Db';
+import { User } from 'firebase/auth';
 
 
 function ChannelCreate({ channelDialog, setChannelDialog }: { channelDialog: boolean, setChannelDialog: (React.Dispatch<React.SetStateAction<boolean>>) }) {
@@ -15,11 +17,16 @@ function ChannelCreate({ channelDialog, setChannelDialog }: { channelDialog: boo
     const loaderContext = useContext(LoaderContext);
 
     useEffect(() => {
-        wsContext.addEventListener(Message.types[Message.types.CREATE_CHANNEL], ev => {
+        wsContext.addEventListener(Message.types[Message.types.CREATE_CHANNEL], async ev => {
             ev.preventDefault();
             if (!isCustomEvent(ev)) return;
 
             loaderContext.setLoaderText("Authenticating...");
+            
+            const data: DataTypes.Server.CREATE_CHANNEL[0] = ev.detail[0];
+
+
+            await Db.setUserChannel(authContext.user as User, data.channelId, 'add')
 
 
             

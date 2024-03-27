@@ -11,6 +11,9 @@ export default new WsEvent<DataTypes.Client.JOIN_CHANNEL>({
         const channelId = data.channelId;
         const user = this.users.get(ws.id);
 
+        console.log("??????")
+        console.log(channelId, this.channels)
+
         let channel = this.channels.get(channelId);
 
         if (!channel) {

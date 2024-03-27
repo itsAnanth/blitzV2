@@ -35,6 +35,8 @@ function Chat() {
 
         initChat();
 
+
+
     }, []);
 
     useEffect(() => {
@@ -68,6 +70,10 @@ function Chat() {
         return () => wsm.removeEventListener(Message.types[Message.types.MESSAGE_CREATE], messageCreate);
     }, [message]);
 
+    async function getChannels() {
+
+    }
+
     async function getUsers() {
         const res = await fetch('http://localhost:3000/users?channelId=123456');
         const val = await res.json();
@@ -86,17 +92,7 @@ function Chat() {
         if (!authContext.user) return navigate('/signup');
 
 
-        // textRef.current?.addEventListener('input', () => {
-        //     if (!textRef.current || !formContainerRef.current) return;
-        //     // @ts-ignore
-        //     window.t = textRef.current
-
-
-
-        //     formContainerRef.current.style.height = `${textRef.current?.scrollHeight}px`;
-        //     textRef.current.style.height = `80%`;
-
-        // })
+        Db.getUser(authContext.user).then(console.log)
 
 
 

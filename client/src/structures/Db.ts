@@ -1,6 +1,6 @@
 import { rdb } from './Firebase';
 import ChatMessage from '../../../shared/ChatMessage/ChatMessage';
-import { set, get, limitToFirst, query, ref, push, limitToLast } from 'firebase/database';
+import { set, get, limitToFirst, query, ref, push, limitToLast, equalTo, orderByChild, onValue } from 'firebase/database';
 import { User } from 'firebase/auth';
 class Db {
 
@@ -25,19 +25,64 @@ class Db {
         return dataArray;
     }
 
+    static async setUserChannel(user: User, channelId: string, flag: 'add' | 'remove') {
+        const reference = ref(rdb, `users`);
+        let data = null as any;
+
+        const snap = await get(query(reference, orderByChild('userId'), equalTo(user.uid)))
+
+        snap.forEach(s => {
+            data = s.val();
+        })
+
+        if (!data.channels)
+            data.channels = [];
+
+        if (flag == 'add') {
+            data.channels.push(channelId)
+        } else {
+            data.channels.splice(data.channels.indexOf(channelId), 1);
+        }
+
+        await set(ref(rdb, `users/${user.uid}`), data);
+
+    }
+
     static async setUser(user: User) {
-        const userData: { userId: string, channels: string[], photoURL: string } = {
+        const userData: { key: string, userId: string, channels: string[], photoURL: string } = {
             userId: user.uid,
             channels: [],
-            photoURL: ''
+            photoURL: '',
+            key: "null"
         }
 
 
-        const reference = ref(rdb, `users/${userData.userId}`);
+        const reference = ref(rdb, `users`);
+        const pushRef = push(reference);
 
-        await set(reference, userData);
+        userData.key = pushRef.key as string;
+
+        await set(pushRef, userData);
 
         // const listRef = ref(rdb, `users/${userid}`)
+    }
+
+    static async getUser(user: User) {
+        const reference = ref(rdb, `users`);
+        let data = null;
+
+        const snap = await get(query(reference, orderByChild('userId'), equalTo(user.uid)))
+
+        snap.forEach(s => {
+            data = s.val();
+        })
+        // onValue(query(reference, orderByChild('userId'), equalTo(user.uid)), snap => {
+        // data = Object.values(snap.val())[0];
+        // });
+
+
+        return data;
+
     }
 }
 
