@@ -1,17 +1,19 @@
-import { ChannelDiv, ChannelsContainer, ChatContainer, ChatContent, ChatDiv, ChatHeader, ChatHeaderBrand, ChatMain, ChatMainContent, ChatMainForm, ChatMainFormSend, ChatMainFormUploadBtn, ChatSidebar, ChatSidebarContainer, ChatSidebarContent, LogoutDiv, User, UserAvatar, UserDetail, UsersContainer } from "./Chat.styled";
+import { ChannelDiv, ChannelsContainer, ChatContainer, ChatContent, ChatDiv, ChatHeader, ChatHeaderBrand, ChatHeaderLeft, ChatMain, ChatMainContent, ChatMainForm, ChatMainFormSend, ChatMainFormUploadBtn, ChatSidebar, ChatSidebarContainer, ChatSidebarContent, LinkDiv, LogoutDiv, User, UserAvatar, UserDetail, UsersContainer } from "./Chat.styled";
 import { ChatMessage } from "../../components";
 import { AiOutlineSend } from 'react-icons/ai';
 import { useContext, useState, useEffect, useRef } from "react";
 import { WebSocketContext } from "../../contexts/websocket.context";
 import Message, { DataTypes } from "../../../../shared/Message";
-import { Logger, isCustomEvent } from "../../utils";
+import { Logger, isCustomEvent, wait } from "../../utils";
 import { useNavigate } from "react-router-dom";
 import { FireBaseContext } from "../../contexts/firebase.context";
 import { LoaderContext } from "../../contexts/loader.context";
 import { CiLogout, CiCirclePlus } from 'react-icons/ci'
 import AccountManager from "../../structures/AccountManager";
-import Db from "../../structures/Db";
-import ChannelCreate from "./ChannelCreate/ChannelCreate";
+import { IoIosLink } from "react-icons/io";
+import type { User as FirebaseUser } from "firebase/auth";
+import { DbChannel, DbUser, channelsDb, messagesDb, usersDb } from "../../../../database";
+import ChannelDialog from "./ChannelDialog/ChannelDialog";
 
 function Chat() {
     const authContext = useContext(FireBaseContext);
@@ -24,10 +26,10 @@ function Chat() {
     type messageType = DataTypes.Server.MESSAGE_CREATE[0];
     const [message, setMessage] = useState<messageType[]>([]);
     const wsm = useContext(WebSocketContext);
-    const [channels, setChannels] = useState<DataTypes.Server.GET_CHANNELS>([]);
-    const [users, setUsers] = useState<({ username: string, avatar: number, id: string })[]>([]);
+    const [channels, setChannels] = useState<DbChannel[]>([]);
+    const [users, setUsers] = useState<{ [userId: string]: DbUser }>({});
     const loaderContext = useContext(LoaderContext);
-    const [channelDialog, setChannelDialog] = useState(false)
+    const [channelDialog, setChannelDialog] = useState<[boolean, 'create'|'join']>([false, 'create'])
 
     const [currentChannel, setCurrentChannel] = useState<string | null>(null);
 
@@ -70,20 +72,6 @@ function Chat() {
         return () => wsm.removeEventListener(Message.types[Message.types.MESSAGE_CREATE], messageCreate);
     }, [message]);
 
-    async function getChannels() {
-
-    }
-
-    async function getUsers() {
-        const res = await fetch('http://localhost:3000/users?channelId=123456');
-        const val = await res.json();
-        setUsers({ ...val });
-
-        console.log(users, 'GETUSERS');
-
-    }
-
-
 
 
     function initChat() {
@@ -92,18 +80,16 @@ function Chat() {
         if (!authContext.user) return navigate('/signup');
 
 
-        Db.getUser(authContext.user).then(console.log)
+        usersDb.getUser(authContext.user).then(console.log)
 
 
 
-        wsm.addEventListener('wsopen', userJoin);
+        wsm.addEventListener('wsopen', handshake);
+        wsm.addEventListener(Message.types[Message.types.SET_ACTIVE_CHANNEL], receivedSetActiveChannel);
+        wsm.addEventListener(Message.types[Message.types.HANDSHAKE], receivedHandshake);
+        // wsm.addEventListener(Message.types[Message.types.JOIN_CHANNEL], joinChannelEvent)
 
-
-
-
-        wsm.addEventListener(Message.types[Message.types.JOIN_CHANNEL], joinChannelEvent)
-
-        wsm.addEventListener(Message.types[Message.types.USER_JOIN], userJoinEvent);
+        // wsm.addEventListener(Message.types[Message.types.USER_JOIN], userJoinEvent);
 
         if (!wsm._open) {
             wsm.connect();
@@ -111,35 +97,79 @@ function Chat() {
         }
     }
 
+    const handshake = () => {
+        user = authContext.user;
+        console.log('ws open');
+        const userId = (authContext.user as FirebaseUser).uid;
+
+        wsm.send(new Message<DataTypes.Client.HANDSHAKE>({
+            type: Message.types.HANDSHAKE,
+            data: [{ userId: userId }]
+        }))
+    }
+
+    const receivedHandshake = async (ev: any) => {
+        if (!isCustomEvent(ev)) return;
+
+
+        loaderContext.setLoaderText("Fetching Channels")
+
+        let dbchannels = await usersDb.getChannelsInUser((authContext.user as FirebaseUser).uid);
+
+        console.log("GETTING DB USER CHANNELS", dbchannels);
+
+
+        setChannels(dbchannels);
+
+        loaderContext.setLoader(false)
+    }
+
     const joinChannelEvent = async (ev: any) => {
         if (!isCustomEvent(ev)) return;
 
-        loaderContext.setLoaderText("Fetching Messages...")
+        // loaderContext.setLoaderText("Fetching Messages...")
 
-        const msg: DataTypes.Server.JOIN_CHANNEL = ev.detail;
-        console.log('JOIN CHANNLE', msg)
+        // const msg: DataTypes.Server.JOIN_CHANNEL = ev.detail;
+        // console.log('JOIN CHANNLE', msg)
 
-        setUsers(msg);
+        // setUsers(msg);
 
-        // const data: any[] = await (await fetch('http://localhost:3000/messages?channelId=12345')).json() //Db.getMessages('12345');
-        const data = await Db.getMessages('12345')
-        console.log("getting data from db", data)
-        setMessage([...message, ...data])
-        loaderContext.setLoader(false)
+        // // const data: any[] = await (await fetch('http://localhost:3000/messages?channelId=12345')).json() //Db.getMessages('12345');
+        // const data = await messagesDb.getMessages('12345')
+        // console.log("getting data from db", data)
+        // setMessage([...message, ...data])
+        // // loaderContext.setLoader(false)
 
-        loaderContext.setLoaderText("")
+        // loaderContext.setLoaderText("Fetching Channels")
 
+        // let dbchannels = await usersDb.getChannelsInUser((authContext.user as FirebaseUser).uid);
+
+        // console.log("GETTING DB USER CHANNELS", dbchannels);
+
+        // // dbchannels = await usersDb.getChannelsInUser()
+
+        // setChannels(dbchannels);
+
+        // // loaderContext.setLoaderText("Fetching channel members");
+
+        // // console.log("channels from state check", channels)
+
+        // const dbusers = await channelsDb.getUsersInChannel(dbchannels[0].channelId);
+
+        // console.log("testing new db function", dbusers)
+
+        // loaderContext.setLoader(false);
         // getUsers();
     }
 
-    const userJoinEvent = () => {
-        setCurrentChannel('12345');
+    // const userJoinEvent = () => {
+    //     setCurrentChannel('12345');
 
-        wsm.send(new Message<DataTypes.Client.JOIN_CHANNEL>({
-            type: Message.types.JOIN_CHANNEL,
-            data: [{ channelId: currentChannel || '12345' }]
-        }))
-    }
+    //     wsm.send(new Message<DataTypes.Client.JOIN_CHANNEL>({
+    //         type: Message.types.JOIN_CHANNEL,
+    //         data: [{ channelId: currentChannel || '12345' }]
+    //     }))
+    // }
 
 
     const sendMessage = (ev: React.FormEvent<HTMLFormElement>) => {
@@ -161,87 +191,152 @@ function Chat() {
         target.message.value = '';
     }
 
-    const userJoin = () => {
-        user = authContext.user;
+    // const userJoin = () => {
+    //     user = authContext.user;
 
-        console.log('ws open');
+    //     console.log('ws open');
 
-        wsm.send(new Message<DataTypes.Client.USER_JOIN>({
-            type: Message.types.USER_JOIN,
-            // @ts-ignore
-            data: [{ username: user.displayName || 'unknown user', userId: user.uid, avatar: Math.floor(Math.random() * 50) }]
-        }))
-    }
+    //     wsm.send(new Message<DataTypes.Client.USER_JOIN>({
+    //         type: Message.types.USER_JOIN,
+    //         // @ts-ignore
+    //         data: [{ username: user.displayName || 'unknown user', userId: user.uid, avatar: Math.floor(Math.random() * 50) }]
+    //     }))
+    // }
 
     const signOut = () => {
         AccountManager.signOut();
         wsm.disconnect();
-        setUsers([]);
+        setUsers({});
         setMessage([]);
 
-        wsm.removeEventListener('wsopen', userJoin);
-        wsm.removeEventListener(Message.types[Message.types.JOIN_CHANNEL], joinChannelEvent);
-        wsm.removeEventListener(Message.types[Message.types.USER_JOIN], userJoinEvent);
+        wsm.removeEventListener('wsopen', handshake);
+        // wsm.removeEventListener(Message.types[Message.types.JOIN_CHANNEL], joinChannelEvent);
+        // wsm.removeEventListener(Message.types[Message.types.USER_JOIN], userJoinEvent);
+
+    }
+
+    const switchChannels = async (channelId: string) => {
+        loaderContext.setLoader(true);
+        await wait(1400);
+        loaderContext.setLoaderText("Switching channels")
+
+
+        setCurrentChannel(channelId);
+
+        loaderContext.setLoaderText("Fetching Channels")
+
+        let dbchannels = await usersDb.getChannelsInUser((authContext.user as FirebaseUser).uid);
+
+        setChannels(dbchannels);
+
+        loaderContext.setLoaderText("Fetching Messages...")
+
+        console.log("GETTING MESSAGES FOR CHANNEL ", channelId);
+
+
+        const dbmessages = await messagesDb.getMessages(channelId, 10);
+
+        setMessage(dbmessages);
+
+        loaderContext.setLoaderText("Fetching channel members...");
+
+        const dbusers = await channelsDb.getUsersInChannel(channelId);
+
+        const dbuserstate: any = {}
+        for (let i = 0; i < dbusers.length; i++) {
+            let idbuser = dbusers[i];
+            let idbuserId = idbuser.userId;
+            dbuserstate[idbuserId as string] = idbuser;
+        }
+        setUsers(dbuserstate);
+
+
+        await wait(2000);
+        loaderContext.setLoader(false);
+
+        console.log(">>?!?!?! set active channel", currentChannel)
+    }
+
+
+    const receivedSetActiveChannel = async (ev: any) => {
+        if (!isCustomEvent(ev)) return;
+        const data: DataTypes.Server.SET_ACTIVE_CHANNEL = ev.detail;
+        console.log(">!>!>!>!>!> RECEIVED ACTIVE CHANNEL", ev.detail)
+        switchChannels(data[0].channelId);
 
     }
 
 
+    const onChannelClick = (channelId: string) => {
+        console.log("A CHANNEL GOT CLICKED", channelId)
 
-    // const joinChannel = (i: number) => {
-    //     const channel = channels[i];
+        wsm.send(new Message<DataTypes.Client.SET_ACTIVE_CHANNEL>({
+            type: Message.types.SET_ACTIVE_CHANNEL,
+            data: [{ channelId }]
+        }))
+    }
 
-    //     setCurrentChannel(channel.id);
 
-    //     wsm.send(new Message<DataTypes.Client.JOIN_CHANNEL>({
-    //         type: Message.types.JOIN_CHANNEL,
-    //         data: [{ channelId: channel.id }]
-    //     }))
-    // }
 
     return (
         <>
             {/* <Loader active={loaderActive} /> */}
             {/* {user ? */}
-            <ChannelCreate channelDialog={channelDialog} setChannelDialog={setChannelDialog} />
-            
+            <ChannelDialog channelDialog={channelDialog} setChannelDialog={setChannelDialog} switchChannels={onChannelClick} />
+
             <ChatDiv>
                 <ChatContainer>
                     <ChatHeader>
                         <ChatHeaderBrand>Blitz App</ChatHeaderBrand>
-                        <LogoutDiv onClick={() => signOut()}>
-                            <CiLogout />
-                        </LogoutDiv>
+                        <ChatHeaderLeft>
+                            <LinkDiv>
+                                <IoIosLink />
+                            </LinkDiv>
+                            <LogoutDiv onClick={() => signOut()}>
+                                <CiLogout />
+                            </LogoutDiv>
+
+                        </ChatHeaderLeft>
                     </ChatHeader>
 
                     <ChatContent>
                         <ChatSidebar width={18}>
+
                             <ChannelsContainer>
-                                <ChannelDiv onClick={() => setChannelDialog(true)}>
+                                {channels.map((channel, index) => (
+                                    <ChannelDiv active={channel.channelId === currentChannel} onClick={() => onChannelClick(channel.channelId)} key={index}>
+                                        {channel.name}
+                                    </ChannelDiv>
+                                ))}
+                                <ChannelDiv onClick={() => setChannelDialog([true, 'create'])}>
                                     <CiCirclePlus style={{ fontSize: '1.5rem' }} />
-                                    Create Channel
+                                    <div style={{ paddingLeft: "0.5rem" }}>Create Channel</div>
+                                </ChannelDiv>
+                                <ChannelDiv onClick={() => setChannelDialog([true, 'join'])}>
+                                    <CiCirclePlus style={{ fontSize: '1.5rem' }} />
+                                    <div style={{ paddingLeft: "0.5rem" }}>Join Channel</div>
                                 </ChannelDiv>
                             </ChannelsContainer>
-
-
-                            {/* {channels.map((item, i) =>
-                                    <ChatSidebarContainer
-                                        key={i}
-                                        onClick={() => joinChannel(i)}
-                                    >
-                                        <ChatSidebarContent className={currentChannel == channels[i].id ? 'active' : ''}>{item.name}</ChatSidebarContent>
-                                    </ChatSidebarContainer>)} */}
                         </ChatSidebar>
                         <ChatMain>
                             <ChatMainContent ref={chatMainRef}>
-                                {message.map((item, i) => (
+                                {!currentChannel ?
                                     <ChatMessage
                                         avatar={0}
-                                        author={item.author}
-                                        content={item.content}
+                                        author="bot"
+                                        content="click a chat to get started"
                                         timestamp={new Date(Date.now()).toLocaleDateString()}
-                                        key={i}
                                     />
-                                ))}
+
+                                    : message.map((item, i) => (
+                                        <ChatMessage
+                                            avatar={0}
+                                            author={users[item.author]?.username}
+                                            content={item.content}
+                                            timestamp={new Date(Date.now()).toLocaleDateString()}
+                                            key={i}
+                                        />
+                                    ))}
                             </ChatMainContent>
                             <ChatMainForm ref={formContainerRef}>
 
@@ -263,9 +358,9 @@ function Chat() {
                         <ChatSidebar width={22}>
 
                             <UsersContainer>{
-                                users.map(user => {
+                                Object.values(users).map(user => {
                                     return (
-                                        <User><UserAvatar src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.avatar}`}></UserAvatar><UserDetail>{user.username}</UserDetail></User>
+                                        <User><UserAvatar src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=${0}`}></UserAvatar><UserDetail>{user.username}</UserDetail></User>
                                     )
                                 })
                             }

@@ -3,15 +3,13 @@ import HttpServer from "./structures/HttpServer";
 import WsServer from "./structures/WsServer";
 import { config } from "dotenv";
 import Logger from "./utils/Logger";
-import { app, db, rdb } from "./database/Firebase";
-import { push, set, ref, query, onValue, child, limitToFirst, get } from "firebase/database";
+import { push, set, ref, query, onValue, child, limitToFirst, get, orderByChild, equalTo } from "firebase/database";
 import { getMessageId } from "./utils";
-import Db from "./database/Db";
+import { rdb } from "../../database";
 
 const httpServer = new HttpServer(3000);
 Logger.DEV = true;
 
-const postListRef = ref(rdb, 'messages' + '/12345');
 // const pushref = push(postListRef);
 
 
@@ -40,6 +38,33 @@ declare module 'websocket' {
         id: string;
     }
 }
+
+(async function() {
+    console.log("hello")
+    const reference = ref(rdb, `channels`);
+    // let data = null as any;
+
+    // const snap = await get(query(reference, orderByChild('channelId'), equalTo("-NvMjN7SAzzsTneDPmMN")))
+
+    
+    // snap.forEach(s => {
+    //     data = s.val();
+    //     console.log(s.val())
+    // })
+
+    // data.name = "updated";
+
+    
+
+    // await set(ref(rdb, `channels/${data.channelId}`), data)
+
+    // console.log(snap.size)
+
+    // const q = await get(reference);
+    // q.forEach(x => {
+    //     console.log(x.val())
+    // })
+})()
 
 // Db.getMessageById("12345")
 

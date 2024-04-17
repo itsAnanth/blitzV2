@@ -6,50 +6,50 @@ import { getMessageId } from "../../utils";
 
 export default new WsEvent<DataTypes.Client.JOIN_CHANNEL>({
     messageType: Message.types.JOIN_CHANNEL,
-    async callback(ws, _message) {
-        const data = _message.data[0];
-        const channelId = data.channelId;
-        const user = this.users.get(ws.id);
+    async callback(_ws, _message) {
+        // const data = _message.data[0];
+        // const channelId = data.channelId;
+        // const user = this.users.get(ws.id);
 
-        console.log("??????")
-        console.log(channelId, this.channels)
+        // console.log("??????")
+        // console.log(channelId, this.channels)
 
-        let channel = this.channels.get(channelId);
+        // let channel = this.channels.get(channelId);
 
-        if (!channel) {
-            channel = new Channel({ id: channelId, name: 'test' });
-            this.channels.set(channelId, channel);
-        }
+        // if (!channel) {
+        //     channel = new Channel({ id: channelId, name: 'test' });
+        //     this.channels.set(channelId, channel);
+        // }
 
-        if (user.activeChannel) {
-            let usersChannel = this.channels.get(user.activeChannel);
-            usersChannel.users.splice(usersChannel.users.indexOf(user.id), 1);
-        }
+        // if (user.activeChannel) {
+        //     let usersChannel = this.channels.get(user.activeChannel);
+        //     usersChannel.users.splice(usersChannel.users.indexOf(user.id), 1);
+        // }
 
-        user.activeChannel = channel.id;
+        // user.activeChannel = channel.id;
 
-        channel.addUser(ws.id);
+        // channel.addUser(ws.id);
 
-        channel.broadCast(this.users, new Message<DataTypes.Server.MESSAGE_CREATE>({
-            type: Message.types.MESSAGE_CREATE,
-            data: [{ content: `${user.username} has joined the chat!`, recipient: '12345', author: 'bot', 'messageId': getMessageId(), timestamp: Date.now()}]
-        }));
+        // channel.broadCast(this.users, new Message<DataTypes.Server.MESSAGE_CREATE>({
+        //     type: Message.types.MESSAGE_CREATE,
+        //     data: [{ content: `${user.username} has joined the chat!`, recipient: '12345', author: 'bot', 'messageId': getMessageId(), timestamp: Date.now()}]
+        // }));
 
-        // ws.send(new Message({
+        // // ws.send(new Message({
+        // //     type: Message.types.JOIN_CHANNEL,
+        // //     data: ['Authorized']
+        // // }).encode());
+
+
+        // channel.broadCast(this.users, new Message<DataTypes.Server.JOIN_CHANNEL>({
         //     type: Message.types.JOIN_CHANNEL,
-        //     data: ['Authorized']
-        // }).encode());
-
-
-        channel.broadCast(this.users, new Message<DataTypes.Server.JOIN_CHANNEL>({
-            type: Message.types.JOIN_CHANNEL,
-            data: channel.getUsers(this.users)
-        }))
+        //     data: channel.getUsers(this.users)
+        // }))
 
         
 
         
-        console.log(`User joined channel ${channel.id}`, channel.users);
+        // console.log(`User joined channel ${channel.id}`, channel.users);
         
     },
 })

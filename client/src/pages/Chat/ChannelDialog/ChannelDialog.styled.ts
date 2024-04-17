@@ -42,14 +42,24 @@ export const ChannelDialog = styled.div<{ show: boolean }>`
 
 export const ChannelDialogHeading = styled.div`
     display: flex;
+    position: relative;
     width: 100%;
     background-color: ${({ theme }) => theme.primary};
     color: ${({ theme }) => theme.text};
 
     height: 20%;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
+
 `
+
+export const ChannelDialogHeadingContent = styled.div`
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`;
 
 export const ChannelDialogContent = styled.div`
     background-color: green;
@@ -63,6 +73,8 @@ export const ChannelDialogContent = styled.div`
 
 export const CloseBtn = styled(IoCloseOutline)`
     color: ${({ theme }) => theme.text};
+    position: absolute;
+    right: 20px;
     font-size: 1.3rem;
     
     :hover {

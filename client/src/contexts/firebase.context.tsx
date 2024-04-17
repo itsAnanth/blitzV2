@@ -1,14 +1,13 @@
 import { createContext, useState, useEffect, useContext } from 'react';
-import { app as FirebaseApp, db as FirebaseDB } from '../structures/Firebase';
-// import firebaseInit from '../structures/Firebase';
 import firebase from 'firebase/app';
 import { browserLocalPersistence, getAuth, inMemoryPersistence, User } from 'firebase/auth';
 import { WebSocketContext } from './websocket.context';
 import { getPersistence } from '../utils';
 import { PersistenceType } from '../utils/setPersistence';
 import { Firestore } from 'firebase/firestore';
+import { app as FirebaseApp } from '../../../database';
 
-const FireBaseContext = createContext<{ app: firebase.FirebaseApp, user: User | null | undefined, db: Firestore }>(null as any);
+const FireBaseContext = createContext<{ app: firebase.FirebaseApp, user: User | null | undefined }>(null as any);
 
 
 const FireBaseProvider = ({ children }: any) => {
@@ -30,7 +29,7 @@ const FireBaseProvider = ({ children }: any) => {
     }, [])
 
     return (
-        <FireBaseContext.Provider value={{ app: app, user: firebaseUser, db: FirebaseDB }}>
+        <FireBaseContext.Provider value={{ app: app, user: firebaseUser }}>
             {children}
         </FireBaseContext.Provider>
     )

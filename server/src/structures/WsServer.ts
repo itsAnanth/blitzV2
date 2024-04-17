@@ -9,9 +9,9 @@ import { Logger, getMessageId } from "../utils";
 import colors from 'colors/safe';
 import Room from "./Channel/Channel";
 import Cache from "./Cache/Cache";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../database/Firebase";
 import Channel from "./Channel/Channel";
+import { ref, query, equalTo, orderByChild, get } from 'firebase/database';
+import { DbChannel, rdb } from "../../../database";
 
 class WsServer extends server {
 
@@ -56,14 +56,18 @@ class WsServer extends server {
 
     async loadChannelsFromDb() {
     
-        const querySnapshot = await getDocs(collection(db, "channels"));
+        const reference = ref(rdb, 'channels');
+        const querySnapshot = await get(reference);
         querySnapshot.forEach((doc) => {
-            // doc.data() is never undefined for query doc snapshots
+            let data: DbChannel = doc.val();
 
-            const data = doc.data();
-            // console.log("QUERY DATA>>", data)
-            const channel = new Channel({ id: data.id, name: data.name, users: data.users })
-            this.channels.set(channel.id, channel);
+            const channel = new Channel({
+                id: data.channelId,
+                name: data.name,
+                users: data.users
+            })
+
+            this.channels.set(data.channelId, channel);
         });
 
         console.log("LOADED CHANNELS", this.channels)
@@ -103,10 +107,10 @@ class WsServer extends server {
 
 
             
-            channel.broadCast(this.users, new Message<DataTypes.Server.MESSAGE_CREATE>({
-                type: Message.types.MESSAGE_CREATE,
-                data: [{ content: `${user.username} has left the chat!`, recipient: '12345', author: 'bot', 'messageId': getMessageId(), timestamp: Date.now() }]
-            }));
+            // channel.broadCast(this.users, new Message<DataTypes.Server.MESSAGE_CREATE>({
+            //     type: Message.types.MESSAGE_CREATE,
+            //     data: [{ content: `${user.username} has left the chat!`, recipient: '12345', author: 'bot', 'messageId': getMessageId(), timestamp: Date.now() }]
+            // }));
 
 
 
@@ -118,10 +122,10 @@ class WsServer extends server {
                 channel.users.splice(channel.users.indexOf(user.id), 1);
             }
 
-            channel.broadCast(this.users, new Message<DataTypes.Server.JOIN_CHANNEL>({
-                type: Message.types.JOIN_CHANNEL,
-                data: channel.getUsers(this.users)
-            }))
+            // channel.broadCast(this.users, new Message<DataTypes.Server.JOIN_CHANNEL>({
+            //     type: Message.types.JOIN_CHANNEL,
+            //     data: channel.getUsers(this.users)
+            // }))
 
             this.users.delete(connection.id);
 

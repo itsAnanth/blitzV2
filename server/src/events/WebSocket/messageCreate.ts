@@ -1,7 +1,6 @@
+import { messagesDb } from "../../../../database";
 import ChatMessage from "../../../../shared/ChatMessage/ChatMessage";
 import Message, { DataTypes } from "../../../../shared/Message";
-import Db from "../../database/Db";
-// import db from "../../database/Main";
 import WsEvent from "../../structures/Events/WsEvent";
 import { getMessageId } from "../../utils";
 
@@ -10,6 +9,8 @@ export default new WsEvent<DataTypes.Client.MESSAGE_CREATE>({
     async callback(ws, _message) {
 
         const user = this.users.get(ws.id);
+
+        console.log("msg create", user.activeChannel)
 
         if (!user) return console.error('no user');
 
@@ -33,7 +34,6 @@ export default new WsEvent<DataTypes.Client.MESSAGE_CREATE>({
 
         console.log(`Message Length ${message.encode().length}`);
 
-        // await db.setMessage(message.data[0].messageId, message.encode())
         room.broadCast(this.users, message);
     },
 })

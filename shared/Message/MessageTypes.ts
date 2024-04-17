@@ -13,7 +13,8 @@ enum MessageTypes {
     CREATE_CHANNEL,
     GET_CHANNEL,
     GET_CHANNELS,
-    SET_ACTIVE_CHANNEL
+    SET_ACTIVE_CHANNEL,
+    HANDSHAKE
 };
 
 export default MessageTypes

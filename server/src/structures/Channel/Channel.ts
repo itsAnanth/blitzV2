@@ -1,9 +1,7 @@
-import { Console } from "console";
-import ChatMessage from "../../../../shared/ChatMessage/ChatMessage";
 import Message, { DataTypes } from "../../../../shared/Message";
-import Db from "../../database/Db";
 import User from "../User/User";
 import WsServer from "../WsServer";
+import { messagesDb } from "../../../../database";
 
 class Channel {
 
@@ -54,7 +52,7 @@ class Channel {
         }
 
         if (message.type === Message.types.MESSAGE_CREATE) {
-            Db.setMessage(this.id, message.data[0])
+            messagesDb.setMessage(this.id, message.data[0]);
         }
     }
 

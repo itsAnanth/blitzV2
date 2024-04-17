@@ -1,6 +1,7 @@
 import { getAuth, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, updateProfile, browserLocalPersistence, inMemoryPersistence } from 'firebase/auth';
 import type { Auth } from 'firebase/auth';
 import { PersistenceType } from '../utils/setPersistence';
+import { usersDb } from '../../../database';
 
 class AccountManager {
 
@@ -18,7 +19,7 @@ class AccountManager {
         if (!user) return console.log('Auth user update error, not signed in');
 
         try {
-            await updateProfile(user, { displayName: username })
+            await updateProfile(user, { displayName: username });
         } catch (e) {
             console.log('Auth user update error');
             console.log(e);
@@ -38,6 +39,8 @@ class AccountManager {
 
             if (!auth.currentUser) return { error: true, detail: 'error' };
             await updateProfile(auth.currentUser, { displayName: username });
+            await usersDb.setUser(auth.currentUser);
+
         } catch (e) {
             console.log('Auth signup error');
             console.log(e);

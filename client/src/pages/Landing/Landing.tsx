@@ -7,7 +7,6 @@ import { FireBaseContext } from '../../contexts/firebase.context';
 import { LoaderContext } from '../../contexts/loader.context';
 import { getPersistence, setPersistence } from '../../utils';
 import { PersistenceType } from '../../utils/setPersistence';
-import Db from '../../structures/Db';
 function Landing({ type }: any) {
 
     const loaderContext = useContext(LoaderContext);
@@ -51,7 +50,6 @@ function Landing({ type }: any) {
             // loaderContext.setLoader(true);
             // loaderContext.setLoaderText("Creating User Data...");
     
-            Db.setUser(authContext.user);
             navigate('/chat')
         }
         // if (authContext.user) navigate('/chat')

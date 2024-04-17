@@ -1,8 +1,14 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from 'firebase/firestore';
 import { getDatabase } from "firebase/database";
+import ChannelsDb from "./channels/channels.db";
+import UsersDb from "./users/users.db";
+import MessagesDb from "./messages/messages.db";
+import type { DbMessage } from './messages/messages.schema';
+import type { DbChannel } from './channels/channels.schema';
+import type { DbUser } from './users/users.schema';
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 // Your web app's Firebase configuration
@@ -24,5 +30,21 @@ const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 const rdb = getDatabase(app);
+
+const channelsDb = new ChannelsDb(rdb);
+const usersDb = new UsersDb(rdb);
+const messagesDb = new MessagesDb(rdb);
+
+export {
+    channelsDb,
+    usersDb,
+    messagesDb
+}
+
+export type {
+    DbUser,
+    DbChannel,
+    DbMessage
+}
 
 export { app, db, rdb };

@@ -60,7 +60,7 @@ export const ChatSidebar = styled.div<{ width?: number }>`
     scrollbar-gutter: stable;
 
     ::-webkit-scrollbar {
-        display: none;
+        /* display: none; */
     }
 
     :hover {
@@ -263,20 +263,28 @@ export const ChannelsContainer = styled.div`
     align-items: flex-start;
     flex-direction: column;
     margin: 5px 0;
-    scrollbar-gutter: stable;
 
 `
 
-export const ChannelDiv = styled.div`
-    margin: 1rem 1rem 0 0.5rem;
+export const ChannelDiv = styled.div<{ active?: boolean }>`
+    /* margin: 1rem 1rem 0 0.5rem; */
+    /* margin: 1rem 1rem 0 0.5rem; */
+
     max-height: 70px;
+    min-height: 70px;
     display: flex;
     color: white;
-    justify-content: space-around;
-    width: 95%;
+    justify-content: center;
+    align-items: center;
+    width: calc(100% - 5px);
     height: 100%;
     align-items: center;
     padding: 1rem 1rem;
+    background-color: ${({ active, theme }) => active && theme.lightbg};
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    word-break: break-word;
+    text-align: center;
 
     :hover {
         cursor: pointer;
@@ -330,6 +338,26 @@ export const LogoutDiv = styled.div`
     color: ${({ theme }) => theme.text};
     font-size: 2rem;
     padding-right: 2rem;
+
+    :hover {
+        transform: scale(1.2);
+        cursor: pointer;
+    }
+`
+
+export const ChatHeaderLeft = styled.div`
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`
+
+export const LinkDiv = styled.div`
+
+    color: ${({ theme }) => theme.text};
+    font-size: 2rem;
+    padding-right: 2rem;
+    font-weight: 100;
 
     :hover {
         transform: scale(1.2);

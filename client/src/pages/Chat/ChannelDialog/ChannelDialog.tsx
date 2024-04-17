@@ -1,16 +1,16 @@
 import React, { useContext, useEffect } from 'react';
-import { ChannelDialog, ChannelDialogContent, ChannelDialogContainer, ChannelDialogHeading, Form, InputContainer, InputHeading, Input, SubmitButton, CloseBtn } from './ChannelCreate.styled';
+import { ChannelDialog as IChannelDialog, ChannelDialogContent, ChannelDialogContainer, ChannelDialogHeading, Form, InputContainer, InputHeading, Input, SubmitButton, CloseBtn, ChannelDialogHeadingContent } from './ChannelDialog.styled';
 import { IoCloseOutline } from 'react-icons/io5'
 import Message, { DataTypes } from '../../../../../shared/Message';
 import { FireBaseContext } from '../../../contexts/firebase.context';
 import { WebSocketContext } from '../../../contexts/websocket.context';
 import { LoaderContext } from '../../../contexts/loader.context';
-import { isCustomEvent } from '../../../utils';
-import Db from '../../../structures/Db';
+import { isCustomEvent, wait } from '../../../utils';
+import { usersDb } from '../../../../../database';
 import { User } from 'firebase/auth';
 
 
-function ChannelCreate({ channelDialog, setChannelDialog }: { channelDialog: boolean, setChannelDialog: (React.Dispatch<React.SetStateAction<boolean>>) }) {
+function ChannelDialog({ channelDialog, setChannelDialog, switchChannels }: { switchChannels: (channelId: string) => any, channelDialog: [boolean, 'create'|'join'], setChannelDialog: (React.Dispatch<React.SetStateAction<[boolean, 'create'|'join']>>) }) {
 
     const authContext = useContext(FireBaseContext);
     const wsContext = useContext(WebSocketContext);
@@ -21,15 +21,21 @@ function ChannelCreate({ channelDialog, setChannelDialog }: { channelDialog: boo
             ev.preventDefault();
             if (!isCustomEvent(ev)) return;
 
-            loaderContext.setLoaderText("Authenticating...");
-            
+            loaderContext.setLoaderText("Creating new channel...");
+
             const data: DataTypes.Server.CREATE_CHANNEL[0] = ev.detail[0];
 
 
-            await Db.setUserChannel(authContext.user as User, data.channelId, 'add')
+            await usersDb.setUserChannel(authContext.user as User, data.channelId, 'add')
 
 
             
+            switchChannels(data.channelId)
+
+
+            setChannelDialog([false, channelDialog[1]]);
+
+
 
 
         })
@@ -52,25 +58,25 @@ function ChannelCreate({ channelDialog, setChannelDialog }: { channelDialog: boo
             type: Message.types.CREATE_CHANNEL,
             data: channelData
         }))
-        
+
 
     }
 
 
     return (
         <ChannelDialogContainer
-            show={channelDialog}
+            show={channelDialog[0]}
         >
-            <ChannelDialog
-                show={channelDialog}
+            <IChannelDialog
+                show={channelDialog[0]}
             >
                 <ChannelDialogHeading>
-                    CreateChannel
-                    <CloseBtn onClick={() => setChannelDialog(false)}>close</CloseBtn>
+                    <ChannelDialogHeadingContent>{channelDialog[1] == 'create' ? "Channel Name" : "Join Channel"}</ChannelDialogHeadingContent>
+                    <CloseBtn onClick={() => setChannelDialog([false, channelDialog[1]])}>close</CloseBtn>
                 </ChannelDialogHeading>
                 <Form onSubmit={onSubmit}>
                     <InputContainer>
-                        <InputHeading>Channel Name</InputHeading>
+                        <InputHeading>{channelDialog[1] == 'create' ? "Channel Name" : "Invite Link/Code"}</InputHeading>
                         <Input
                             type="text"
                             name="channelname"
@@ -81,13 +87,13 @@ function ChannelCreate({ channelDialog, setChannelDialog }: { channelDialog: boo
                         />
                     </InputContainer>
                     <InputContainer justify='flex-end'>
-                        <SubmitButton type='submit'>Create</SubmitButton>
+                        <SubmitButton type='submit'>{channelDialog[1] === 'create' ? 'Create' : 'Join'}</SubmitButton>
                     </InputContainer>
                 </Form>
 
-            </ChannelDialog>
+            </IChannelDialog>
         </ChannelDialogContainer>
     )
 }
 
-export default ChannelCreate;
+export default ChannelDialog;
