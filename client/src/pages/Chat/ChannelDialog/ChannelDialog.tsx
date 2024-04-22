@@ -10,7 +10,7 @@ import { usersDb } from '../../../../../database';
 import { User } from 'firebase/auth';
 
 
-function ChannelDialog({ channelDialog, setChannelDialog, switchChannels }: { switchChannels: (channelId: string) => any, channelDialog: [boolean, 'create'|'join'], setChannelDialog: (React.Dispatch<React.SetStateAction<[boolean, 'create'|'join']>>) }) {
+function ChannelDialog({ channelDialog, setChannelDialog, switchChannels }: { switchChannels: (channelId: string) => any, channelDialog: [boolean, 'create' | 'join'], setChannelDialog: (React.Dispatch<React.SetStateAction<[boolean, 'create' | 'join']>>) }) {
 
     const authContext = useContext(FireBaseContext);
     const wsContext = useContext(WebSocketContext);
@@ -29,11 +29,36 @@ function ChannelDialog({ channelDialog, setChannelDialog, switchChannels }: { sw
             await usersDb.setUserChannel(authContext.user as User, data.channelId, 'add')
 
 
-            
+
             switchChannels(data.channelId)
 
 
-            setChannelDialog([false, channelDialog[1]]);
+            // setChannelDialog([false, channelDialog[1]]);
+
+
+
+
+
+        })
+
+
+        wsContext.addEventListener(Message.types[Message.types.JOIN_CHANNEL], async ev => {
+            ev.preventDefault();
+            if (!isCustomEvent(ev)) return;
+
+            loaderContext.setLoaderText("Creating new channel...");
+
+            const data: DataTypes.Server.JOIN_CHANNEL[0] = ev.detail[0];
+
+
+            await usersDb.setUserChannel(authContext.user as User, data.channelId, 'add')
+
+
+
+            switchChannels(data.channelId)
+
+
+            // setChannelDialog([false, channelDialog[1]]);
 
 
 
@@ -42,22 +67,34 @@ function ChannelDialog({ channelDialog, setChannelDialog, switchChannels }: { sw
     }, [])
 
     async function onSubmit(ev: any) {
+        const joinChannel = channelDialog[1] === 'join';
         loaderContext.setLoader(true)
-        loaderContext.setLoaderText("Creating new channel...")
+        loaderContext.setLoaderText(joinChannel ? "Joining Channel" : "Creating new channel...")
         ev.preventDefault();
-        let channelName = ev.target.channelname.value;
 
-        const channelData: DataTypes.Client.CREATE_CHANNEL = [
-            {
-                channelName: channelName,
-                owner: authContext.user?.uid as string
-            }
-        ]
+        if (joinChannel) {
+            let channelName = ev.target.channelname.value;
 
-        wsContext.send(new Message({
-            type: Message.types.CREATE_CHANNEL,
-            data: channelData
-        }))
+            wsContext.send(new Message({
+                type: Message.types.JOIN_CHANNEL,
+                data: [{ channelId: channelName }]
+            }))
+
+        } else {
+            let channelName = ev.target.channelname.value;
+
+            const channelData: DataTypes.Client.CREATE_CHANNEL = [
+                {
+                    channelName: channelName,
+                    owner: authContext.user?.uid as string
+                }
+            ]
+
+            wsContext.send(new Message({
+                type: Message.types.CREATE_CHANNEL,
+                data: channelData
+            }))
+        }
 
 
     }

@@ -114,15 +114,36 @@ export const LandingFooter = styled.div`
 
 `
 
+
+export const SignInProviders = styled.div`
+    display: flex;
+    height: 100%;
+    color: ${({ theme }) => theme.lightText};
+    margin-right: 4rem;
+    font-size: 1.3rem;
+
+
+    & > * {
+        :hover {
+            cursor: pointer;
+            transform: scale(1.3);
+        }
+        transition: all 500ms ease;
+
+    }
+`
+
 export const CheckBoxContainer = styled.div`
 
     /* width: 100%; */
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-evenly;
     flex-direction: row;
     width: 100%;
     padding-bottom: 1rem;
+
+
 
 `; 
 export const CheckBoxLabel = styled.label`

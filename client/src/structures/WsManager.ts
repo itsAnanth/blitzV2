@@ -27,11 +27,6 @@ class WsManager extends EventTarget {
 
     }
 
-    private wsHandshake() {
-        this.send(
-            new Message<DataTypes.Client.CONNECT>({ type: Message.types.CONNECT, data: [{ username: 'test' }] })
-        )
-    }
 
     connect() {
         const protocol = this.wsprotocol;

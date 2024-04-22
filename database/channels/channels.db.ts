@@ -59,6 +59,24 @@ class ChannelsDb {
     }
 
 
+    async addUserToChannel(channelId: string, userId: string) {
+        const reference = ref(this.rdb, `channels`);
+        let data: DbChannel;
+        const snap = await (get(query(reference, orderByChild("channelId"), equalTo(channelId))));
+
+        snap.forEach(s => {
+            data = s.val();
+        })
+
+        if (!data.users.includes(userId)) {
+            data.users.push(userId);
+        }
+
+        await set(ref(this.rdb, `channels/${data.channelId}`), data)
+        return data;
+    }
+
+
 
     async setChannel({ name, owner }: { name: string, owner: string }) {
         const reference = ref(this.rdb, `channels`);

@@ -364,3 +364,28 @@ export const LinkDiv = styled.div`
         cursor: pointer;
     }
 `
+
+export const NoChat = styled.div`
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: ${({ theme }) => theme.bg};
+
+    /* background-color: red; */
+`;
+
+export const NoChatIcon = styled.div`
+    font-size: 10rem;
+    color: ${({ theme }) => theme.lightText};
+
+`;
+
+export const NoChatContent = styled.div`
+    color: ${({ theme }) => theme.lightText};
+    font-weight: 400;
+    font-size: 1.3rem;
+    
+`

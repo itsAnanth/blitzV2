@@ -1,7 +1,8 @@
-import { getAuth, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, updateProfile, browserLocalPersistence, inMemoryPersistence } from 'firebase/auth';
-import type { Auth } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, updateProfile, browserLocalPersistence, inMemoryPersistence, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import type { Auth, UserCredential } from 'firebase/auth';
 import { PersistenceType } from '../utils/setPersistence';
 import { usersDb } from '../../../database';
+import { LandingTypes } from '../utils/LandingTypes';
 
 class AccountManager {
 
@@ -31,7 +32,48 @@ class AccountManager {
     }
 
 
+    static async signUpWithGoogle(type: LandingTypes) {
+        const provider = new GoogleAuthProvider();
+        const auth = getAuth();
+        let result: UserCredential;
+        try {
+            result = await signInWithPopup(auth, provider);
+            // This gives you a Google Access Token. You can use it to access the Google API.
+            const credential = GoogleAuthProvider.credentialFromResult(result);
+            // const token = credential.accessToken;
+            // The signed-in user info.
+            const user = result.user;
+            // IdP data available using getAdditionalUserInfo(result)
+            // ...
+            if (!auth.currentUser) return { error: true, detail: 'error' };
+
+            // await updateProfile(auth.currentUser, { displayName: user.displayName });
+            type === LandingTypes.SIGNUP && await usersDb.setUser(auth.currentUser);
+
+        } catch (error: any) {                // Handle Errors here.
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // The email of the user's account used.
+            const email = error.customData.email;
+            // The AuthCredential type that was used.
+            const credential = GoogleAuthProvider.credentialFromError(error);
+            // ...
+
+            console.log('Google Auth signup error');
+            console.log(error);
+            return { error: true, detail: (error as any).code };
+        };
+
+        // @ts-ignore
+        const user = result.user;
+
+        return { error: false, detail: user };
+
+    }
+
+
     static async signUp(username: string, email: string, password: string) {
+
         const auth: Auth = getAuth();
         let result;
         try {
@@ -47,7 +89,7 @@ class AccountManager {
             return { error: true, detail: (e as any).code };
         }
 
-    
+
 
         const user = result.user;
 
@@ -56,6 +98,7 @@ class AccountManager {
 
 
     static async signIn(email: string, password: string) {
+
         const auth: Auth = getAuth();
         let result;
         try {

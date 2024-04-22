@@ -1,5 +1,4 @@
-import { messagesDb } from "../../../../database";
-import ChatMessage from "../../../../shared/ChatMessage/ChatMessage";
+import { DbMessage, messagesDb } from "../../../../database";
 import Message, { DataTypes } from "../../../../shared/Message";
 import WsEvent from "../../structures/Events/WsEvent";
 import { getMessageId } from "../../utils";
@@ -18,7 +17,7 @@ export default new WsEvent<DataTypes.Client.MESSAGE_CREATE>({
 
         if (!room) return console.error('no active room');
 
-        const messageData: ChatMessage = {
+        const messageData: DbMessage = {
             messageId: getMessageId(),
             author: _message.data[0].author,
             timestamp: Date.now(),

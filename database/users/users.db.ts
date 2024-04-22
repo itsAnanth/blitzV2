@@ -17,7 +17,7 @@ class UsersDb {
         const userData: DbUser = {
             userId: user.uid,
             channels: [],
-            photoURL: '',
+            photoURL: user.photoURL,
             timestamp: Date.now(),
             username: user.displayName
         }
@@ -29,11 +29,11 @@ class UsersDb {
         // const listRef = ref(rdb, `users/${userid}`)
     }
 
-    async getUser(user: User): Promise<DbUser | null> {
+    async getUser(user: User|string): Promise<DbUser | null> {
         const reference = ref(this.rdb, `users`);
         let data: DbUser;
 
-        const snap = await get(query(reference, orderByChild('userId'), equalTo(user.uid)))
+        const snap = await get(query(reference, orderByChild('userId'), equalTo(typeof user === 'string' ? user : user.uid)))
 
         snap.forEach(s => {
             data = s.val();
@@ -60,10 +60,14 @@ class UsersDb {
         let data: DbUser;
         
         const snap = await (get(query(reference, orderByChild("userId"), equalTo(userId))));
-        const channels = [];
+        const channels: DbChannel[] = [];
         snap.forEach(s => {
             data = s.val();
         })
+
+        console.log("get channels in user", data)
+
+        if (!data.channels) return channels;
 
         for (let i = 0; i < data.channels.length; i++) {
             const channelId = data.channels[i];

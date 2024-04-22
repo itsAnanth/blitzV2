@@ -3,18 +3,19 @@ import WsEvent from "../../structures/Events/WsEvent";
 import Channel from "../../structures/Channel/Channel";
 import ServerUser from "../../structures/User/User";
 import { getMessageId } from "../../utils";
+import { channelsDb, usersDb } from "../../../../database";
 
 export default new WsEvent<DataTypes.Client.JOIN_CHANNEL>({
     messageType: Message.types.JOIN_CHANNEL,
-    async callback(_ws, _message) {
-        // const data = _message.data[0];
-        // const channelId = data.channelId;
-        // const user = this.users.get(ws.id);
+    async callback(ws, _message) {
+        const data = _message.data[0];
+        const channelId = data.channelId;
+        const user = this.users.get(ws.id);
 
         // console.log("??????")
         // console.log(channelId, this.channels)
 
-        // let channel = this.channels.get(channelId);
+        let channel = this.channels.get(channelId);
 
         // if (!channel) {
         //     channel = new Channel({ id: channelId, name: 'test' });
@@ -30,15 +31,19 @@ export default new WsEvent<DataTypes.Client.JOIN_CHANNEL>({
 
         // channel.addUser(ws.id);
 
-        // channel.broadCast(this.users, new Message<DataTypes.Server.MESSAGE_CREATE>({
-        //     type: Message.types.MESSAGE_CREATE,
-        //     data: [{ content: `${user.username} has joined the chat!`, recipient: '12345', author: 'bot', 'messageId': getMessageId(), timestamp: Date.now()}]
-        // }));
+        const userData = await usersDb.getUser(user.id);
 
-        // // ws.send(new Message({
-        // //     type: Message.types.JOIN_CHANNEL,
-        // //     data: ['Authorized']
-        // // }).encode());
+        await channelsDb.addUserToChannel(channelId, user.id)
+
+        channel.broadCast(this.users, new Message<DataTypes.Server.MESSAGE_CREATE>({
+            type: Message.types.MESSAGE_CREATE,
+            data: [{ content: `${userData.username} has joined the chat!`, recipient: channelId, author: 'bot', 'messageId': getMessageId(), timestamp: Date.now()}]
+        }));
+
+        ws.send(new Message({
+            type: Message.types.JOIN_CHANNEL,
+            data: [{ channelId: channelId }]
+        }).encode());
 
 
         // channel.broadCast(this.users, new Message<DataTypes.Server.JOIN_CHANNEL>({

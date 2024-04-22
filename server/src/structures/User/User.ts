@@ -1,6 +1,4 @@
 import { connection } from "websocket";
-import User from "../../../../shared/User/User";
-import { JsonWebKey } from 'crypto';
 
 class ServerUser {
 
