@@ -2,9 +2,10 @@ import { Database, equalTo, get, orderByChild, query, ref, set } from "firebase/
 import { User } from 'firebase/auth';
 import { DbUser } from "./users.schema";
 import { DbChannel } from "../channels/channels.schema";
+import { getDownloadURL, getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 
 class UsersDb {
-    
+
     rdb: Database;
 
     constructor(rdb: Database) {
@@ -29,7 +30,9 @@ class UsersDb {
         // const listRef = ref(rdb, `users/${userid}`)
     }
 
-    async getUser(user: User|string): Promise<DbUser | null> {
+
+
+    async getUser(user: User | string): Promise<DbUser | null> {
         const reference = ref(this.rdb, `users`);
         let data: DbUser;
 
@@ -58,7 +61,7 @@ class UsersDb {
         const reference = ref(this.rdb, `users`);
         const channelReference = ref(this.rdb, `channels`);
         let data: DbUser;
-        
+
         const snap = await (get(query(reference, orderByChild("userId"), equalTo(userId))));
         const channels: DbChannel[] = [];
         snap.forEach(s => {
@@ -137,6 +140,22 @@ class UsersDb {
 
         await set(ref(this.rdb, `users/${user.uid}`), data);
 
+    }
+
+    async uploadProfilePicture(file: File, userId: string) {
+        const storage = getStorage();
+        const fileRef = storageRef(storage, `profile_pictures/${userId}.png`);
+
+
+        const snapshot = await uploadBytes(fileRef, file);
+        const photoURL = await getDownloadURL(fileRef);
+
+
+        return photoURL;
+    }
+
+    async updateUser(user: DbUser) {
+        await set(ref(this.rdb, `users/${user.userId}`), user);
     }
 
 }

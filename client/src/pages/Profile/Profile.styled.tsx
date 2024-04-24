@@ -33,13 +33,49 @@ export const ProfileContent = styled.div`
     min-height: calc(100vh - 100px);
 `
 
+export const ProfileContentImageContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 100%;
+`
+
 export const ProfileContentImage = styled.img`
     margin: 3rem 0;
     object-fit: cover;
     border-radius: 50%;
     width: 20%;
-    max-width: 100px;
+    max-width: 150px;
     /* height: 30%; */
+
+`
+
+export const ProfileContentImageOverlay = styled.div`
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.5);
+
+    z-index: 99;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    opacity: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    transition: all 0.3s ease;
+    &:hover {
+        opacity: 0.9;
+        cursor: pointer;
+    }
+
+    & > * {
+        font-size: 2rem;
+        opacity: 1;
+        color: ${({ theme }) => theme.text};
+    }
+
 
 `
 

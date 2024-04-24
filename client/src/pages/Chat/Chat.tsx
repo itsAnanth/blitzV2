@@ -105,14 +105,14 @@ function Chat() {
             const data: DataTypes.Server.USER_JOIN = ev.detail;
 
 
-    
+
             setUsers({ ...users, [data[0].userId]: data[0] })
-    
+
         }
 
         wsm.addEventListener(Message.types[Message.types.USER_JOIN], receivedUserJoin);
 
-        return () => {wsm.removeEventListener(Message.types[Message.types.USER_JOIN], receivedUserJoin) };
+        return () => { wsm.removeEventListener(Message.types[Message.types.USER_JOIN], receivedUserJoin) };
 
 
     }, [users, setUsers])
@@ -194,7 +194,7 @@ function Chat() {
     }, []);
 
 
-    const getChannels = async() => {
+    const getChannels = async () => {
         let dbchannels = await usersDb.getChannelsInUser((authContext.user as FirebaseUser).uid);
 
         console.log("GETTING DB USER CHANNELS", dbchannels);
@@ -228,7 +228,7 @@ function Chat() {
     }
 
 
-    const signOut = async() => {
+    const signOut = async () => {
         loaderContext.setLoader(true)
         loaderContext.setLoaderText('Logging out...')
         console.log('signing out');
@@ -323,7 +323,7 @@ function Chat() {
         }))
     }
 
-    const redirectToProfile = async(userId: string) => {
+    const redirectToProfile = async (userId: string) => {
         loaderContext.setLoader(true);
         loaderContext.setLoaderText('Loading user data...')
         await wait(1500);
@@ -340,7 +340,7 @@ function Chat() {
 
     return (
         <>
-            <ChannelDialog channelDialog={channelDialog} setChannelDialog={setChannelDialog} switchChannels={onChannelClick} />
+            {/* <ChannelDialog channelDialog={channelDialog} setChannelDialog={setChannelDialog} switchChannels={onChannelClick} /> */}
 
             <ChatDiv>
                 <ChatContainer>
@@ -367,14 +367,7 @@ function Chat() {
                                         {channel.name}
                                     </ChannelDiv>
                                 ))}
-                                <ChannelDiv onClick={() => setChannelDialog([true, 'create'])}>
-                                    <CiCirclePlus style={{ fontSize: '1.5rem' }} />
-                                    <div style={{ paddingLeft: "0.5rem" }}>Create Channel</div>
-                                </ChannelDiv>
-                                <ChannelDiv onClick={() => setChannelDialog([true, 'join'])}>
-                                    <CiCirclePlus style={{ fontSize: '1.5rem' }} />
-                                    <div style={{ paddingLeft: "0.5rem" }}>Join Channel</div>
-                                </ChannelDiv>
+                                <ChannelDialog switchChannels={onChannelClick} />
                             </ChannelsContainer>
                         </ChatSidebar>
                         <ChatMain>
@@ -428,7 +421,10 @@ function Chat() {
                                 Object.values(users).map((user, index) => {
                                     return (
                                         <User key={index} onClick={() => redirectToProfile(user.userId)}>
-                                            <UserAvatar src={user?.photoURL ?? `https://api.dicebear.com/7.x/pixel-art/svg?seed=${0}`} />
+                                            <UserAvatar
+                                                crossOrigin="anonymous"
+                                                referrerPolicy="no-referrer"
+                                                src={user?.photoURL ?? `https://api.dicebear.com/7.x/pixel-art/svg?seed=${0}`} />
                                             <UserDetail>{user.username}</UserDetail>
                                         </User>
                                     )
