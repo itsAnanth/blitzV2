@@ -46,7 +46,7 @@ function ChannelDialog({ channelDialog, setChannelDialog, switchChannels }: { sw
             ev.preventDefault();
             if (!isCustomEvent(ev)) return;
 
-            loaderContext.setLoaderText("Creating new channel...");
+            loaderContext.setLoaderText("Joining new channel...");
 
             const data: DataTypes.Server.JOIN_CHANNEL[0] = ev.detail[0];
 

@@ -1,7 +1,7 @@
 import { ChannelDiv, ChannelsContainer, ChatContainer, ChatContent, ChatDiv, ChatHeader, ChatHeaderBrand, ChatHeaderLeft, ChatMain, ChatMainContent, ChatMainForm, ChatMainFormSend, ChatMainFormUploadBtn, ChatSidebar, ChatSidebarContainer, ChatSidebarContent, LinkDiv, LogoutDiv, NoChat, NoChatContent, NoChatIcon, User, UserAvatar, UserDetail, UsersContainer } from "./Chat.styled";
 import { ChatMessage } from "../../components";
 import { AiOutlineSend } from 'react-icons/ai';
-import { useContext, useState, useEffect, useRef } from "react";
+import { useContext, useState, useEffect, useRef, useCallback } from "react";
 import { WebSocketContext } from "../../contexts/websocket.context";
 import Message, { DataTypes } from "../../../../shared/Message";
 import { Logger, isCustomEvent, wait } from "../../utils";
@@ -15,6 +15,8 @@ import type { User as FirebaseUser } from "firebase/auth";
 import { DbChannel, DbUser, channelsDb, messagesDb, usersDb } from "../../../../database";
 import ChannelDialog from "./ChannelDialog/ChannelDialog";
 import { MdMessage } from "react-icons/md";
+import Profile from "../Profile/Profile";
+import CopyLink from "./CopyLink/CopyLink";
 
 function Chat() {
     const authContext = useContext(FireBaseContext);
@@ -45,6 +47,10 @@ function Chat() {
 
     useEffect(() => {
 
+        // @ts-ignore
+        window.ws = wsm;
+
+        console.log("FIRST ITME EFFECT CALLED")
         initChat();
 
 
@@ -54,9 +60,12 @@ function Chat() {
             users: true
         })
 
+        // if (wsm._open)
+        //     getChannels()
 
 
-    }, []);
+
+    }, [navigate]);
 
     useEffect(() => {
         if (authContext.user === null) navigate('/')
@@ -88,6 +97,25 @@ function Chat() {
 
         return () => { console.log("removing message listener"); wsm.removeEventListener(Message.types[Message.types.MESSAGE_CREATE], messageCreate) };
     }, [message, setMessage]);
+
+    useEffect(() => {
+
+        const receivedUserJoin = async (ev: any) => {
+            if (!isCustomEvent(ev)) return;
+            const data: DataTypes.Server.USER_JOIN = ev.detail;
+
+
+    
+            setUsers({ ...users, [data[0].userId]: data[0] })
+    
+        }
+
+        wsm.addEventListener(Message.types[Message.types.USER_JOIN], receivedUserJoin);
+
+        return () => {wsm.removeEventListener(Message.types[Message.types.USER_JOIN], receivedUserJoin) };
+
+
+    }, [users, setUsers])
 
     useEffect(() => {
         if (Object.values(loadingStatus).every(v => v === true)) {
@@ -127,18 +155,22 @@ function Chat() {
 
 
 
-        wsm.addEventListener('wsopen', handshake);
-        wsm.addEventListener(Message.types[Message.types.SET_ACTIVE_CHANNEL], receivedSetActiveChannel);
-        wsm.addEventListener(Message.types[Message.types.HANDSHAKE], receivedHandshake);
+
 
 
         if (!wsm._open) {
             wsm.connect();
 
+            wsm.addEventListener('wsopen', handshake,);
+            wsm.addEventListener(Message.types[Message.types.SET_ACTIVE_CHANNEL], receivedSetActiveChannel);
+            wsm.addEventListener(Message.types[Message.types.HANDSHAKE], receivedHandshake);
+
         }
     }
 
-    const handshake = () => {
+    const handshake = useCallback(() => {
+        // @ts-ignore
+        // console.log('LOGGING EVENT LISTENER FOR WSOPNE', getEventListeners(wsm, 'wsopen'))
         user = authContext.user;
         console.log('ws open');
         const userId = (authContext.user as FirebaseUser).uid;
@@ -147,22 +179,28 @@ function Chat() {
             type: Message.types.HANDSHAKE,
             data: [{ userId: userId }]
         }))
-    }
+    }, [])
 
-    const receivedHandshake = async (ev: any) => {
+    const receivedHandshake = useCallback(async (ev: any) => {
         if (!isCustomEvent(ev)) return;
 
 
 
         loaderContext.setLoaderText("Fetching Channels")
 
+        getChannels()
+
+
+    }, []);
+
+
+    const getChannels = async() => {
         let dbchannels = await usersDb.getChannelsInUser((authContext.user as FirebaseUser).uid);
 
         console.log("GETTING DB USER CHANNELS", dbchannels);
 
 
         setChannels(dbchannels);
-
 
     }
 
@@ -190,18 +228,26 @@ function Chat() {
     }
 
 
-    const signOut = () => {
-        AccountManager.signOut();
+    const signOut = async() => {
+        loaderContext.setLoader(true)
+        loaderContext.setLoaderText('Logging out...')
+        console.log('signing out');
+        await wait(1500)
+
+        console.log('signing out');
         wsm.disconnect();
         setUsers({});
         setMessage([]);
         setCurrentChannel(null)
         setChannels([]);
-        
+
 
         wsm.removeEventListener('wsopen', handshake);
         wsm.removeEventListener(Message.types[Message.types.SET_ACTIVE_CHANNEL], receivedSetActiveChannel);
         wsm.removeEventListener(Message.types[Message.types.HANDSHAKE], receivedHandshake);
+
+        wsm.disconnect();
+        await AccountManager.signOut();
 
     }
 
@@ -254,13 +300,15 @@ function Chat() {
     }
 
 
-    const receivedSetActiveChannel = async (ev: any) => {
+    const receivedSetActiveChannel = useCallback(async (ev: any) => {
         if (!isCustomEvent(ev)) return;
         const data: DataTypes.Server.SET_ACTIVE_CHANNEL = ev.detail;
         console.log(">!>!>!>!>!> RECEIVED ACTIVE CHANNEL", ev.detail)
         switchChannels(data[0].channelId);
 
-    }
+    }, []);
+
+
 
 
     const onChannelClick = (channelId: string) => {
@@ -272,12 +320,23 @@ function Chat() {
         }))
     }
 
+    const redirectToProfile = async(userId: string) => {
+        loaderContext.setLoader(true);
+        loaderContext.setLoaderText('Loading user data...')
+        await wait(1500);
+
+        navigate(`/profile?id=${userId}`)
+    }
+
+
+    const copyChannelCodeToClipboard = () => {
+
+    }
+
 
 
     return (
         <>
-            {/* <Loader active={loaderActive} /> */}
-            {/* {user ? */}
             <ChannelDialog channelDialog={channelDialog} setChannelDialog={setChannelDialog} switchChannels={onChannelClick} />
 
             <ChatDiv>
@@ -285,6 +344,7 @@ function Chat() {
                     <ChatHeader>
                         <ChatHeaderBrand>Blitz App</ChatHeaderBrand>
                         <ChatHeaderLeft>
+                            {/* <CopyLink  /> */}
                             <LinkDiv>
                                 <IoIosLink />
                             </LinkDiv>
@@ -361,22 +421,27 @@ function Chat() {
                         </ChatMain>
                         <ChatSidebar width={22}>
 
-                            <UsersContainer>{
-                                Object.values(users).map(user => {
+                            {currentChannel ? <UsersContainer >{
+                                Object.values(users).map((user, index) => {
                                     return (
-                                        <User>
+                                        <User key={index} onClick={() => redirectToProfile(user.userId)}>
                                             <UserAvatar src={user?.photoURL ?? `https://api.dicebear.com/7.x/pixel-art/svg?seed=${0}`} />
                                             <UserDetail>{user.username}</UserDetail>
-                                            </User>
+                                        </User>
                                     )
                                 })
                             }
                             </UsersContainer>
+                                :
+                                <>
+                                    <></>
+                                </>
+                            }
                         </ChatSidebar>
                     </ChatContent>
                 </ChatContainer>
             </ChatDiv>
-            {/* : <Navigate to={'/signup'} />} */}
+
         </>
     )
 }

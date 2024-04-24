@@ -1,6 +1,6 @@
 import { GlobalStyles } from './Global.styled';
 import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
-import { Chat, Landing, Test } from './pages';
+import { Chat, Landing, Profile, Test } from './pages';
 import { ThemeProvider } from 'styled-components';
 import { blueThemeLight, darkTheme } from './data/Theme';
 import { LandingTypes } from './utils/LandingTypes';
@@ -33,6 +33,7 @@ function App() {
 								<Route path='/signin' element={<Landing type={LandingTypes.SIGNIN} />} />
 								<Route path='/chat' element={<Chat />} />
 								<Route path='/test' element={<Test />} />
+								<Route path='/profile' element={<Profile />} />
 							</Routes>
 						</LoaderProvider>
 					</BrowserRouter>

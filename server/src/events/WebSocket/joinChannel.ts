@@ -40,6 +40,11 @@ export default new WsEvent<DataTypes.Client.JOIN_CHANNEL>({
             data: [{ content: `${userData.username} has joined the chat!`, recipient: channelId, author: 'bot', 'messageId': getMessageId(), timestamp: Date.now()}]
         }));
 
+        channel.broadCast(this.users, new Message({
+            type: Message.types.USER_JOIN,
+            data: [userData]
+        }), [userData.userId])
+
         ws.send(new Message({
             type: Message.types.JOIN_CHANNEL,
             data: [{ channelId: channelId }]

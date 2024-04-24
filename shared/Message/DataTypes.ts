@@ -14,6 +14,7 @@ export namespace DataTypes {
         export type GET_CHANNELS = ReturnType<Channel['serialize']>[];
         export type JOIN_CHANNEL = [{ channelId: string }];
         export type SET_ACTIVE_CHANNEL = [{ channelId: string }];
+        export type USER_JOIN = [DbUser];
 
     }
 

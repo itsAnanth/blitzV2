@@ -120,6 +120,8 @@ class WsServer extends server {
                 const channel = this.channels.get(user.activeChannel);
 
                 channel.users.splice(channel.users.indexOf(user.id), 1);
+
+                Logger.log('[USER LEFT CHANNEL]', channel.id, channel.users.values())
             }
 
             // channel.broadCast(this.users, new Message<DataTypes.Server.JOIN_CHANNEL>({

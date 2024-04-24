@@ -31,6 +31,7 @@ class WsManager extends EventTarget {
     connect() {
         const protocol = this.wsprotocol;
         const hostname = this.host;
+        
 
         this.ws = new WebSocket(`${protocol}://${hostname}`);
 
@@ -42,8 +43,11 @@ class WsManager extends EventTarget {
     }
 
     disconnect() {
-        this.ws?.close();
         this._open = false;
+
+        this.ws?.close();
+
+
     }
 
     send(data: Message | Buffer) {

@@ -39,7 +39,7 @@ class Channel {
         return res;
     }
 
-    broadCast(users: WsServer['users'], message: Message) {
+    broadCast(users: WsServer['users'], message: Message, blacklist: string[] = []) {
         console.log("in room broadcast", [...users.entries()].map(x => x[0]));
         for (let i = 0; i < this.users.length; i++) {
             const user = users.get(this.users[i]);
@@ -47,6 +47,9 @@ class Channel {
             // console.log(user.id);
 
             if (!user) continue;
+
+            if (blacklist.includes(user.id)) continue;
+
 
             user.socket.send(message.encode());
 
