@@ -286,7 +286,7 @@ export const ChannelDiv = styled.div<{ active?: boolean }>`
     word-break: break-word;
     text-align: center;
 
-    :hover {
+    &:hover {
         cursor: pointer;
         background-color: ${({ theme }) => theme.lightbg};
     }

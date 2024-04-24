@@ -259,8 +259,9 @@ function Chat() {
             messages: false,
             users: false
         })
-        await wait(2000);
         loaderContext.setLoaderText("Switching channels")
+
+        await wait(2000);
 
 
         setCurrentChannel(channelId);
@@ -313,6 +314,8 @@ function Chat() {
 
     const onChannelClick = (channelId: string) => {
         console.log("A CHANNEL GOT CLICKED", channelId)
+
+        if (currentChannel === channelId) return;
 
         wsm.send(new Message<DataTypes.Client.SET_ACTIVE_CHANNEL>({
             type: Message.types.SET_ACTIVE_CHANNEL,
