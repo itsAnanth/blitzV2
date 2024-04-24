@@ -347,10 +347,10 @@ function Chat() {
                     <ChatHeader>
                         <ChatHeaderBrand>Blitz App</ChatHeaderBrand>
                         <ChatHeaderLeft>
-                            {/* <CopyLink  /> */}
-                            <LinkDiv>
+                            {currentChannel && <CopyLink channelId={currentChannel as string} />}
+                            {/* <LinkDiv>
                                 <IoIosLink />
-                            </LinkDiv>
+                            </LinkDiv> */}
                             <LogoutDiv onClick={() => signOut()}>
                                 <CiLogout />
                             </LogoutDiv>
