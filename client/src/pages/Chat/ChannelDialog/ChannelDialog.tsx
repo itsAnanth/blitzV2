@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { ChannelDialog as IChannelDialog, ChannelDialogContent, ChannelDialogContainer, ChannelDialogHeading, Form, InputContainer, InputHeading, Input, SubmitButton, CloseBtn, ChannelDialogHeadingContent } from './ChannelDialog.styled';
 import { IoCloseOutline } from 'react-icons/io5'
 import Message, { DataTypes } from '../../../../../shared/Message';
@@ -41,54 +41,71 @@ function ChannelDialog({ switchChannels }: { switchChannels: (channelId: string)
         setOpen(false);
     };
 
+    const receivedCreateChannel = useCallback(async (ev: any) => {
+        ev.preventDefault();
+        if (!isCustomEvent(ev)) return;
+
+        loaderContext.setLoaderText("Creating new channel...");
+
+        const data: DataTypes.Server.CREATE_CHANNEL[0] = ev.detail[0];
+
+
+        await usersDb.setUserChannel(authContext.user as User, data.channelId, 'add')
+
+
+
+        switchChannels(data.channelId)
+
+
+        // setChannelDialog([false, channelDialog[1]]);
+
+
+
+
+
+    }, [])
+
+    const receivedJoinChannel = useCallback(async (ev: any) => {
+        ev.preventDefault();
+        if (!isCustomEvent(ev)) return;
+
+        loaderContext.setLoaderText("Joining new channel...");
+
+        const data: DataTypes.Server.JOIN_CHANNEL[0] = ev.detail[0];
+
+
+        await usersDb.setUserChannel(authContext.user as User, data.channelId, 'add')
+
+
+
+        switchChannels(data.channelId)
+
+
+        // setChannelDialog([false, channelDialog[1]]);
+
+
+
+
+    }, [])
+
+    const detachChannelEvents = useCallback(() => {
+        wsContext.removeEventListener(Message.types[Message.types.CREATE_CHANNEL], receivedCreateChannel)
+
+
+        wsContext.removeEventListener(Message.types[Message.types.JOIN_CHANNEL], receivedJoinChannel)
+        wsContext.removeEventListener('wsclose', detachChannelEvents);
+    }, [])
+
     useEffect(() => {
-        wsContext.addEventListener(Message.types[Message.types.CREATE_CHANNEL], async ev => {
-            ev.preventDefault();
-            if (!isCustomEvent(ev)) return;
+        if (!wsContext.attachedChannelEvents) {
+            wsContext.addEventListener(Message.types[Message.types.CREATE_CHANNEL], receivedCreateChannel)
 
-            loaderContext.setLoaderText("Creating new channel...");
+            wsContext.addEventListener('wsclose', detachChannelEvents);
 
-            const data: DataTypes.Server.CREATE_CHANNEL[0] = ev.detail[0];
+            wsContext.addEventListener(Message.types[Message.types.JOIN_CHANNEL], receivedJoinChannel)
 
-
-            await usersDb.setUserChannel(authContext.user as User, data.channelId, 'add')
-
-
-
-            switchChannels(data.channelId)
-
-
-            // setChannelDialog([false, channelDialog[1]]);
-
-
-
-
-
-        })
-
-
-        wsContext.addEventListener(Message.types[Message.types.JOIN_CHANNEL], async ev => {
-            ev.preventDefault();
-            if (!isCustomEvent(ev)) return;
-
-            loaderContext.setLoaderText("Joining new channel...");
-
-            const data: DataTypes.Server.JOIN_CHANNEL[0] = ev.detail[0];
-
-
-            await usersDb.setUserChannel(authContext.user as User, data.channelId, 'add')
-
-
-
-            switchChannels(data.channelId)
-
-
-            // setChannelDialog([false, channelDialog[1]]);
-
-
-
-
-        })
+            wsContext.attachedChannelEvents = true;
+        }
     }, [])
 
     async function onSubmit(ev: any) {
@@ -212,7 +229,9 @@ function ChannelDialog({ switchChannels }: { switchChannels: (channelId: string)
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleClose}>Cancel</Button>
+                        <Button
+
+                            onClick={handleClose}>Cancel</Button>
                         <Button type="submit">{type == 'join' ? 'Join Channel' : 'Create Channel'}</Button>
                     </DialogActions>
                 </Dialog>

@@ -5,7 +5,7 @@ import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { LandingTypes } from '../../utils/LandingTypes';
 import { FireBaseContext } from '../../contexts/firebase.context';
 import { LoaderContext } from '../../contexts/loader.context';
-import { getPersistence, setPersistence } from '../../utils';
+import { getPersistence, setPersistence, wait } from '../../utils';
 import { PersistenceType } from '../../utils/setPersistence';
 import { FaGoogle } from "react-icons/fa";
 function Landing({ type }: { type: LandingTypes }) {
@@ -49,9 +49,9 @@ function Landing({ type }: { type: LandingTypes }) {
         setError(null);
     }, [type])
 
-    useEffect(() => {
-        loaderContext.setLoader(false);
-    }, [])
+    // useEffect(() => {
+    //     loaderContext.setLoader(false);
+    // }, [])
 
     useEffect(() => {
         console.log(authContext.user, 'landing state changed');
@@ -60,14 +60,21 @@ function Landing({ type }: { type: LandingTypes }) {
             // loaderContext.setLoader(true);
             // loaderContext.setLoaderText("Creating User Data...");
 
-            navigate('/chat')
-        }
+            (async function(){
+                loaderContext.setLoader(true);
+                loaderContext.setLoaderText('Signing in...');
+                
+                await wait(2000);
+                navigate('/chat')
+            })()
+        } else
+            loaderContext.setLoader(false)
         // if (authContext.user) navigate('/chat')
     }, [authContext.user])
 
     return (
         <>
-            {authContext.user ? <Navigate to={'/chat'} /> :
+            {/* {authContext.user ? <Navigate to={'/chat'} /> : */}
                 <LandingDiv>
                     <LandingContainer>
                         <LandingHeader>Blitz App</LandingHeader>
@@ -161,7 +168,7 @@ function Landing({ type }: { type: LandingTypes }) {
                         </LandingFooter>
                     </LandingContainer>
                 </LandingDiv>
-            }
+            {/* } */}
         </>
     )
 }

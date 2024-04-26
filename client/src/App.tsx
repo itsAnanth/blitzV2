@@ -8,6 +8,7 @@ import { Logger } from './utils';
 import FireBaseProvider from './contexts/firebase.context';
 import LoaderProvider from './contexts/loader.context';
 import WebSocketProvider from './contexts/websocket.context';
+import AlertProvider from './contexts/alert.context';
 
 
 function App() {
@@ -21,25 +22,31 @@ function App() {
 	// wsm.connect()
 
 	return (
-		<ThemeProvider theme={darkTheme}>
-			<WebSocketProvider>
-				<FireBaseProvider>
-					<BrowserRouter>
-						<GlobalStyles />
-						<LoaderProvider>
-							<Routes>
-								<Route path='/' element={<Navigate to={'/signup'} />} />
-								<Route path='/signup' element={<Landing type={LandingTypes.SIGNUP} />} />
-								<Route path='/signin' element={<Landing type={LandingTypes.SIGNIN} />} />
-								<Route path='/chat' element={<Chat />} />
-								<Route path='/test' element={<Test />} />
-								<Route path='/profile' element={<Profile />} />
-							</Routes>
-						</LoaderProvider>
-					</BrowserRouter>
-				</FireBaseProvider>
-			</WebSocketProvider>
-		</ThemeProvider>
+		<>
+			<ThemeProvider theme={darkTheme}>
+
+
+				<WebSocketProvider>
+					<FireBaseProvider>
+						<BrowserRouter>
+							<GlobalStyles />
+							<LoaderProvider>
+								<AlertProvider>
+									<Routes>
+										<Route path='/' element={<Navigate to={'/signup'} />} />
+										<Route path='/signup' element={<Landing type={LandingTypes.SIGNUP} />} />
+										<Route path='/signin' element={<Landing type={LandingTypes.SIGNIN} />} />
+										<Route path='/chat' element={<Chat />} />
+										<Route path='/test' element={<Test />} />
+										<Route path='/profile' element={<Profile />} />
+									</Routes>
+								</AlertProvider>
+							</LoaderProvider>
+						</BrowserRouter>
+					</FireBaseProvider>
+				</WebSocketProvider>
+			</ThemeProvider>
+		</>
 		// <>
 		// 	<GlobalStyles />
 		// 	<Landing />

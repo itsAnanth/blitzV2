@@ -10,11 +10,18 @@ export const GlobalStyles = createGlobalStyle`
 	/* scrollbar-gutter: stable; */
 
 }
+
+
+
 * {
 	font-family: 'Montserrat', sans-serif;
 	margin: 0;
 	box-sizing: border-box;
 }
+/* * {
+  outline: 1px solid #f00 !important;
+} */
+
 
 a {
 	text-decoration: none;

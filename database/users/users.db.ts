@@ -70,7 +70,7 @@ class UsersDb {
 
         console.log("get channels in user", data)
 
-        if (!data.channels) return channels;
+        if (!data || !data.channels) return channels;
 
         for (let i = 0; i < data.channels.length; i++) {
             const channelId = data.channels[i];

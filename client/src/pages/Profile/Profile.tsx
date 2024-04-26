@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { FireBaseContext } from "../../contexts/firebase.context";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { redirect, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { BackspaceIcon, FieldContent, FieldHeading, NoUserFound, ProfileContainer, ProfileContent, ProfileContentField, ProfileContentFieldContainer, ProfileContentImage, ProfileContentImageContainer, ProfileContentImageOverlay, ProfileHeader } from "./Profile.styled";
 import { LoaderContext } from "../../contexts/loader.context";
 import { DbUser, usersDb } from "../../../../database";
@@ -19,18 +19,11 @@ import { CiCirclePlus } from 'react-icons/ci';
 import { Box, Input } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import EditProfileImage from "./EditProfileImage/EditProfileImage";
+import DeleteAccount from "./DeleteAccount/DeleteAccount";
+import EditUsername from "./EditUsername/EditUsername";
 
-const VisuallyHiddenInput = styled('input')({
-    clip: 'rect(0 0 0 0)',
-    clipPath: 'inset(50%)',
-    height: 1,
-    overflow: 'hidden',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    whiteSpace: 'nowrap',
-    width: 1,
-});
+
 
 
 function Profile() {
@@ -39,7 +32,7 @@ function Profile() {
     const navigate = useNavigate();
     const loaderContext = useContext(LoaderContext);
     const [searchParams, setSearchParams] = useSearchParams()
-    const [user, setUser] = useState<DbUser>();
+    const [user, setUser] = useState<DbUser | null | undefined>(undefined);
     const idParam = searchParams.get('id');
     const [open, setOpen] = useState(false);
     const themeContext = useContext(ThemeContext);
@@ -63,102 +56,32 @@ function Profile() {
     }, [])
 
     useEffect(() => {
-        console.log("user changed", user)
-        if (user == null) {
-            console.log("profile useeff hook", user)
-            // return navigate('/signup')
+        console.log('change', user)
+        if (authContext.user === null) {
+            return navigate('/')
         }
-        if (loaderContext)
-            loaderContext.setLoader(false);
-    }, [user])
 
-    const handleClose = () => {
-        setOpen(false);
+        if (loaderContext.loader)
+            loaderContext.setLoader(false)
+    }, [authContext.user])
+
+
+    const redirectToChat = async () => {
+        if (true)
+            return navigate('/chat')
     }
 
-    const handleOpen = () => {
-        setOpen(true)
-    }
-
-    const onSubmit = async (ev: any) => {
-        ev.preventDefault()
-
-        const formData = new FormData();
-        // @ts-ignore
-        formData.append('file', file)
-
-        if (!file) return console.error("no file")
 
 
-        console.log(file)
 
-        // const photoURL = await usersDb.uploadProfilePicture(file, authContext.user?.uid as string)
-        // const user = await usersDb.getUser(authContext.user?.uid as string) as DbUser;
-
-        // if (!user) console.error('no user');
-
-        // user.photoURL = photoURL;
-        // await usersDb.updateUser(user);
-
-        // console.log("uploaded!!!", photoURL)
-    }
-
-    const onFileChange = (ev: any) => {
-        setFile(ev.target.files[0])
-    }
 
     return (
 
         <>
-            <React.Fragment>
-
-                <Dialog
-                    open={open}
-
-                    onClose={handleClose}
-                    PaperProps={{
-                        component: 'form',
-                        onSubmit: onSubmit,
-                        style: {
-                            backgroundColor: themeContext.tertiary,
-                            color: themeContext.text
-                        }
-                    }}
-                >
-                    <DialogTitle style={{
-                        color: themeContext.text
-                    }}>Upload Profile Picture</DialogTitle>
-                    <DialogContent >
-                        <DialogContentText style={{
-                            color: themeContext.lightText,
-                            marginBottom: '1.5rem'
-                        }}>Your new Profile Picture</DialogContentText>
-                        <Box width={'100%'} display={'flex'} justifyContent={'center'}>
-                            <Button
-                                component="label"
-                                role={undefined}
-                                variant="contained"
-                                tabIndex={-1}
-                                startIcon={<CloudUploadIcon />}
-                            >
-                                Upload file
-                                <VisuallyHiddenInput type="file" onChange={onFileChange} />
-                            </Button>
-                        </Box>
-          
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleClose}>Cancel</Button>
-                        <Button
-                            disabled={file != null ? false : true}
-                            type="submit">Upload</Button>
-                    </DialogActions>
-                </Dialog>
-            </React.Fragment>
 
             <ProfileContainer>
                 <ProfileHeader>
-                    <BackspaceIcon onClick={() => navigate('/chat')}>
+                    <BackspaceIcon onClick={() => redirectToChat()}>
                         <IoArrowBack />
                     </BackspaceIcon>
                     {idParam ? 'User Profile' : 'My Profile'}
@@ -166,23 +89,10 @@ function Profile() {
                 {
                     user ?
                         <ProfileContent>
-                            <ProfileContentImageContainer>
-                                <ProfileContentImage
-
-                                    crossOrigin="anonymous"
-                                    referrerPolicy="no-referrer"
-                                    src={user?.photoURL}
-                                />
-                                <ProfileContentImageOverlay onClick={() => handleOpen()}>
-                                    <FaPen />
-                                </ProfileContentImageOverlay>
-                            </ProfileContentImageContainer>
+                            <EditProfileImage user={user} setUser={setUser} />
 
                             <ProfileContentFieldContainer>
-                                <ProfileContentField>
-                                    <FieldHeading>Display Name</FieldHeading>
-                                    <FieldContent>{user?.username}</FieldContent>
-                                </ProfileContentField>
+                                <EditUsername user={user} setUser={setUser} />
 
                                 <ProfileContentField>
                                     <FieldHeading>User ID</FieldHeading>
@@ -199,6 +109,13 @@ function Profile() {
                                     {/** @ts-ignore */}
                                     <FieldContent>{new Date(user?.timestamp).toDateString()}</FieldContent>
                                 </ProfileContentField>
+                                {user.userId === authContext.user?.uid &&
+                                    <ProfileContentField id="lol">
+                                        <FieldHeading>Account Deletion</FieldHeading>
+                                        <FieldContent><DeleteAccount /></FieldContent>
+                                    </ProfileContentField>
+                                }
+
 
 
                             </ProfileContentFieldContainer>

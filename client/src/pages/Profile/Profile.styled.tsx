@@ -2,12 +2,16 @@ import styled from "styled-components";
 
 export const ProfileContainer = styled.div`
     width: 100vw;
-    height: 100vh;
+    max-width: 100%;
+    min-height: 100vh;
     display: flex;
     background-color: ${({ theme }) => theme.bg};
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
+    overflow-x: hidden !important;
+    height: auto;
+    
 
 `
 
@@ -35,6 +39,8 @@ export const ProfileContent = styled.div`
 
 export const ProfileContentImageContainer = styled.div`
     display: flex;
+    padding: 3rem 0;
+
     justify-content: center;
     align-items: center;
     position: relative;
@@ -42,10 +48,10 @@ export const ProfileContentImageContainer = styled.div`
 `
 
 export const ProfileContentImage = styled.img`
-    margin: 3rem 0;
     object-fit: cover;
     border-radius: 50%;
-    width: 20%;
+    width: 150px;
+    height: 150px;
     max-width: 150px;
     /* height: 30%; */
 
@@ -83,22 +89,33 @@ export const ProfileContentFieldContainer = styled.div`
     
     background-color: ${({ theme }) => theme.bg};
     width: 80%;
-    margin-bottom: 1rem;
+    height: auto;
+    /* margin-bottom: 1rem; */
     border-radius: 15px;
 
 `
 
 export const ProfileContentField = styled.div`
-    margin: 1rem 1rem 1.5rem;
+    position: relative;
+
+    padding: 1rem 1rem 1.5rem;
     width: 100%;
+    max-width: 100%;
     display: flex;
     flex-direction: column;
     color: ${({ theme }) => theme.text};
+    border: 1px solid transparent;
+
+    &:hover {
+        background-color: ${({ theme }) => theme.secondary};
+        border-radius: 10px;
+        border: 1px solid ${({ theme }) => theme.primary};
+    }
 `
 
 export const FieldHeading = styled.div`
     color: ${({ theme }) => theme.lightText};
-    margin-bottom: 1rem;
+    padding-bottom: 1rem;
     font-size: 1.3rem;
 `
 
@@ -122,5 +139,13 @@ export const BackspaceIcon = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    left: 30px
+    left: 30px;
+`
+
+export const FieldEditBtn = styled.div`
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translate(0, -50%);
+
 `

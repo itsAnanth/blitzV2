@@ -10,6 +10,8 @@ class WsManager extends EventTarget {
     wsprotocol: string;
     httpprotocol: string;
     _open: boolean;
+    attachedChannelEvents: boolean;
+    hasFinishedInitialLoad: boolean;
 
     private _lastMessageSent: { m: Message | null, t: number };
 
@@ -24,6 +26,8 @@ class WsManager extends EventTarget {
         this.httpprotocol = window.location.protocol === 'http:' ? 'http' : 'https';
         this._lastMessageSent = { m: null, t: Date.now() };
         this._open = false;
+        this.hasFinishedInitialLoad = false;
+        this.attachedChannelEvents = false;
 
     }
 
@@ -46,6 +50,9 @@ class WsManager extends EventTarget {
         this._open = false;
 
         this.ws?.close();
+
+        this.hasFinishedInitialLoad = false;
+        this.dispatchEvent(new CustomEvent('wsclose'))
 
 
     }

@@ -1,4 +1,4 @@
-import { getAuth, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, updateProfile, browserLocalPersistence, inMemoryPersistence, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, updateProfile, browserLocalPersistence, inMemoryPersistence, signInWithPopup, GoogleAuthProvider, deleteUser } from 'firebase/auth';
 import type { Auth, UserCredential } from 'firebase/auth';
 import { PersistenceType } from '../utils/setPersistence';
 import { usersDb } from '../../../database';
@@ -29,6 +29,41 @@ class AccountManager {
         }
 
         return true;
+    }
+
+    static async updateProfilePicture(photoURL: string) {
+        const auth: Auth = getAuth();
+
+        const user = auth.currentUser;
+
+        if (!user) return console.log('Auth user update error, not signed in');
+
+        try {
+            await updateProfile(user, { photoURL: photoURL });
+        } catch (e) {
+            console.log('Auth user update error');
+            console.log(e);
+            // @ts-ignore
+            return e.code;
+        }
+
+        return true;
+    }
+
+    static async deleteUserAccount() {
+        const auth = getAuth();
+        try {
+            console.log('trying')
+            if (auth.currentUser)
+                await deleteUser(auth.currentUser)
+        } catch (error) {
+            console.log('auth account delete error');
+            console.log(error);
+            return { error: true, detail: (error as any).code };
+    
+        }
+
+        return { error: false, detail: null }
     }
 
 

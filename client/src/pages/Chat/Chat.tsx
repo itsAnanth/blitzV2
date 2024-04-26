@@ -39,7 +39,6 @@ function Chat() {
     const [message, setMessage] = useState<messageType[]>([]);
     const [channels, setChannels] = useState<DbChannel[]>([]);
     const [users, setUsers] = useState<{ [userId: string]: DbUser }>({});
-    const [channelDialog, setChannelDialog] = useState<[boolean, 'create' | 'join']>([false, 'create'])
     const [loadingStatus, setLoadingStatus] = useState<LoadingStatus>({ channels: true, users: true, messages: true });
     const [currentChannel, setCurrentChannel] = useState<string | null>(null);
 
@@ -62,18 +61,22 @@ function Chat() {
 
         // if (wsm._open)
         //     getChannels()
+        if (wsm.hasFinishedInitialLoad) {
+            // getChannels()
+            // setCurrentChannel(null)
+            navigate(0)
+        }
 
 
-
-    }, [navigate]);
+    }, []);
 
     useEffect(() => {
         if (authContext.user === null) navigate('/')
     }, [authContext.user])
 
-    useEffect(() => {
-        console.log(users)
-    }, [users])
+    // useEffect(() => {
+    //     console.log(users)
+    // }, [users])
 
     useEffect(() => {
         chatMainRef.current?.scrollTo({ 'top': chatMainRef.current.scrollHeight });
@@ -118,17 +121,21 @@ function Chat() {
     }, [users, setUsers])
 
     useEffect(() => {
+        console.log('loading status for change', loadingStatus)
+
         if (Object.values(loadingStatus).every(v => v === true)) {
             loaderContext.setLoader(false);
-            if (channelDialog)
-                setChannelDialog([false, channelDialog[1]]);
-        } else
+        } else {
             loaderContext.setLoader(true);
+            console.log('loadingstatus loader being set to true')
+        }
     }, [loadingStatus])
 
     useEffect(() => {
         const status = { ...loadingStatus }
         status.channels = true;
+
+
         setLoadingStatus(status)
     }, [channels])
 
@@ -161,7 +168,7 @@ function Chat() {
         if (!wsm._open) {
             wsm.connect();
 
-            wsm.addEventListener('wsopen', handshake,);
+            wsm.addEventListener('wsopen', handshake);
             wsm.addEventListener(Message.types[Message.types.SET_ACTIVE_CHANNEL], receivedSetActiveChannel);
             wsm.addEventListener(Message.types[Message.types.HANDSHAKE], receivedHandshake);
 
@@ -188,7 +195,9 @@ function Chat() {
 
         loaderContext.setLoaderText("Fetching Channels")
 
-        getChannels()
+        getChannels();
+
+        wsm.hasFinishedInitialLoad = true;
 
 
     }, []);
@@ -254,51 +263,66 @@ function Chat() {
     const switchChannels = async (channelId: string) => {
         // loaderContext.setLoader(true);
 
+        console.log('switching channels to ====', channelId);
+        console.log('switching channels, current channel ===', currentChannel)
         setLoadingStatus({
             channels: false,
             messages: false,
             users: false
         })
         loaderContext.setLoaderText("Switching channels")
+        console.log('Switching channels 1')
 
         await wait(2000);
+        console.log('Switching channels 2')
 
 
         setCurrentChannel(channelId);
 
-        loaderContext.setLoaderText("Fetching Channels")
 
-        let dbchannels = await usersDb.getChannelsInUser((authContext.user as FirebaseUser).uid);
-
-        setChannels(dbchannels);
-
-        loaderContext.setLoaderText("Fetching Messages...")
-
-        console.log("GETTING MESSAGES FOR CHANNEL ", channelId);
-
-
-        const dbmessages = await messagesDb.getMessages(channelId, 10);
-
-        setMessage(dbmessages);
-
-        loaderContext.setLoaderText("Fetching channel members...");
-
-        const dbusers = await channelsDb.getUsersInChannel(channelId);
-
-        const dbuserstate: any = {}
-        for (let i = 0; i < dbusers.length; i++) {
-            let idbuser = dbusers[i];
-            let idbuserId = idbuser.userId;
-            dbuserstate[idbuserId as string] = idbuser;
-        }
-        setUsers(dbuserstate);
-
-
-        // await wait(2000);
-        // loaderContext.setLoader(false);
-
-        console.log(">>?!?!?! set active channel", currentChannel)
     }
+
+    useEffect(() => {
+        console.log('IN SWITCH CHANNEL USE EFFECT', currentChannel)
+        if (!currentChannel) return;
+        (async function () {
+            console.log('IN SWITCH CHANNEL USE EFFECT', currentChannel)
+
+            const channelId = currentChannel;
+            loaderContext.setLoaderText("Fetching Channels")
+
+            let dbchannels = await usersDb.getChannelsInUser((authContext.user as FirebaseUser).uid);
+
+            setChannels(dbchannels);
+
+            loaderContext.setLoaderText("Fetching Messages...")
+
+            console.log("GETTING MESSAGES FOR CHANNEL ", channelId);
+
+
+            const dbmessages = await messagesDb.getMessages(channelId, 10);
+
+            setMessage(dbmessages);
+
+            loaderContext.setLoaderText("Fetching channel members...");
+
+            const dbusers = await channelsDb.getUsersInChannel(channelId);
+
+            const dbuserstate: any = {}
+            for (let i = 0; i < dbusers.length; i++) {
+                let idbuser = dbusers[i];
+                let idbuserId = idbuser.userId;
+                dbuserstate[idbuserId as string] = idbuser;
+            }
+            setUsers(dbuserstate);
+
+
+            // await wait(2000);
+            // loaderContext.setLoader(false);
+
+            console.log(">>?!?!?! set active channel", currentChannel)
+        })()
+    }, [currentChannel])
 
 
     const receivedSetActiveChannel = useCallback(async (ev: any) => {
@@ -323,12 +347,12 @@ function Chat() {
         }))
     }
 
-    const redirectToProfile = async (userId: string) => {
+    const redirectToProfile = async (userId?: string) => {
         loaderContext.setLoader(true);
         loaderContext.setLoaderText('Loading user data...')
         await wait(1500);
 
-        navigate(`/profile?id=${userId}`)
+        navigate(userId ? `/profile?id=${userId}` : '/profile')
     }
 
 
@@ -429,12 +453,17 @@ function Chat() {
                                         </User>
                                     )
                                 })
-                            }
-                            </UsersContainer>
+                            }</UsersContainer>
                                 :
-                                <>
-                                    <></>
-                                </>
+                                <UsersContainer>
+                                    <User onClick={() => redirectToProfile()}>
+                                        <UserAvatar
+                                            crossOrigin="anonymous"
+                                            referrerPolicy="no-referrer"
+                                            src={authContext.user?.photoURL ?? `https://api.dicebear.com/7.x/pixel-art/svg?seed=${0}`} />
+                                        <UserDetail>{authContext.user?.displayName}</UserDetail>
+                                    </User>
+                                </UsersContainer>
                             }
                         </ChatSidebar>
                     </ChatContent>
