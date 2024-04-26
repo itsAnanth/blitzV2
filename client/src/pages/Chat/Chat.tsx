@@ -17,6 +17,7 @@ import ChannelDialog from "./ChannelDialog/ChannelDialog";
 import { MdMessage } from "react-icons/md";
 import Profile from "../Profile/Profile";
 import CopyLink from "./CopyLink/CopyLink";
+import { Tooltip } from "@mui/material";
 
 function Chat() {
     const authContext = useContext(FireBaseContext);
@@ -41,6 +42,7 @@ function Chat() {
     const [users, setUsers] = useState<{ [userId: string]: DbUser }>({});
     const [loadingStatus, setLoadingStatus] = useState<LoadingStatus>({ channels: true, users: true, messages: true });
     const [currentChannel, setCurrentChannel] = useState<string | null>(null);
+    const [isLoaded, setIsLoaded] = useState(false);
 
 
 
@@ -53,11 +55,7 @@ function Chat() {
         initChat();
 
 
-        setLoadingStatus({
-            messages: true,
-            channels: false,
-            users: true
-        })
+        setIsLoaded(false);
 
         // if (wsm._open)
         //     getChannels()
@@ -121,35 +119,11 @@ function Chat() {
     }, [users, setUsers])
 
     useEffect(() => {
-        console.log('loading status for change', loadingStatus)
-
-        if (Object.values(loadingStatus).every(v => v === true)) {
+        if (!isLoaded)
+            loaderContext.setLoader(true)
+        else
             loaderContext.setLoader(false);
-        } else {
-            loaderContext.setLoader(true);
-            console.log('loadingstatus loader being set to true')
-        }
-    }, [loadingStatus])
-
-    useEffect(() => {
-        const status = { ...loadingStatus }
-        status.channels = true;
-
-
-        setLoadingStatus(status)
-    }, [channels])
-
-    useEffect(() => {
-        const status = { ...loadingStatus }
-        status.messages = true;
-        setLoadingStatus(status)
-    }, [message])
-
-    useEffect(() => {
-        const status = { ...loadingStatus }
-        status.users = true;
-        setLoadingStatus(status)
-    }, [users])
+    }, [isLoaded])
 
 
     function initChat() {
@@ -166,7 +140,10 @@ function Chat() {
 
 
         if (!wsm._open) {
+            Logger.logc('lightgreen', 'CONNECTING_WS', 'initiating connection');
+
             wsm.connect();
+            Logger.logc('lightgreen', 'ADD_EVENT_LISTENERS', 'adding listeners');
 
             wsm.addEventListener('wsopen', handshake);
             wsm.addEventListener(Message.types[Message.types.SET_ACTIVE_CHANNEL], receivedSetActiveChannel);
@@ -195,30 +172,25 @@ function Chat() {
 
         loaderContext.setLoaderText("Fetching Channels")
 
-        getChannels();
-
-        wsm.hasFinishedInitialLoad = true;
+        Promise.all([getChannels()]).then(() => {
+            setIsLoaded(true);
+            wsm.hasFinishedInitialLoad = true;
+        })
 
 
     }, []);
 
 
-    const getChannels = async () => {
-        let dbchannels = await usersDb.getChannelsInUser((authContext.user as FirebaseUser).uid);
 
-        console.log("GETTING DB USER CHANNELS", dbchannels);
-
-
-        setChannels(dbchannels);
-
-    }
 
 
 
     const sendMessage = (ev: React.FormEvent<HTMLFormElement>) => {
 
-        console.log("sending message")
         ev.preventDefault();
+
+        Logger.logc('lightgreen', 'SENDING_MESSAGE', 'sending message to', currentChannel);
+
 
         if (!authContext.user) return Logger.error('user undefined on send message');
 
@@ -238,18 +210,19 @@ function Chat() {
 
 
     const signOut = async () => {
+        Logger.logc('lightgreen', 'SIGNING_OUT', 'signing out user');
         loaderContext.setLoader(true)
         loaderContext.setLoaderText('Logging out...')
-        console.log('signing out');
         await wait(1500)
 
-        console.log('signing out');
         wsm.disconnect();
         setUsers({});
         setMessage([]);
         setCurrentChannel(null)
         setChannels([]);
 
+
+        Logger.log('lightgreen', 'REMOVE_EVENT_LISTENERS', 'flushing listeners');
 
         wsm.removeEventListener('wsopen', handshake);
         wsm.removeEventListener(Message.types[Message.types.SET_ACTIVE_CHANNEL], receivedSetActiveChannel);
@@ -261,74 +234,72 @@ function Chat() {
     }
 
     const switchChannels = async (channelId: string) => {
-        // loaderContext.setLoader(true);
-
-        console.log('switching channels to ====', channelId);
-        console.log('switching channels, current channel ===', currentChannel)
-        setLoadingStatus({
-            channels: false,
-            messages: false,
-            users: false
-        })
+        Logger.logc('lightgreen', 'SWITCHING_CHANNELS', 'confirmed ws message, switching to', channelId);
+        setIsLoaded(false)
         loaderContext.setLoaderText("Switching channels")
-        console.log('Switching channels 1')
-
         await wait(2000);
-        console.log('Switching channels 2')
-
-
         setCurrentChannel(channelId);
+    }
 
+
+    const getChannels = async () => {
+        Logger.logc('purple', "DB_USERS", "getting channels in user", authContext.user?.uid);
+
+        let dbchannels = await usersDb.getChannelsInUser((authContext.user as FirebaseUser).uid);
+
+
+
+        setChannels(dbchannels);
+
+        return dbchannels;
 
     }
 
+    const getUsers = async (channelId: string) => {
+        Logger.logc('purple', "DB_CHANNELS", "getting users in channel", channelId);
+
+        loaderContext.setLoaderText('Fetching users...')
+
+        const dbusers = await channelsDb.getUsersInChannel(channelId);
+
+        const dbuserstate: any = {}
+        for (let i = 0; i < dbusers.length; i++) {
+            let idbuser = dbusers[i];
+            let idbuserId = idbuser.userId;
+            dbuserstate[idbuserId as string] = idbuser;
+        }
+        setUsers(dbuserstate);
+    }
+
+    const getMessages = async (channelId: string) => {
+        Logger.logc('purple', "DB_MESSAGES", "getting messages in channel", channelId);
+
+
+
+        const dbmessages = await messagesDb.getMessages(channelId, 10);
+
+        setMessage(dbmessages);
+    }
+
+
     useEffect(() => {
-        console.log('IN SWITCH CHANNEL USE EFFECT', currentChannel)
         if (!currentChannel) return;
-        (async function () {
-            console.log('IN SWITCH CHANNEL USE EFFECT', currentChannel)
 
-            const channelId = currentChannel;
-            loaderContext.setLoaderText("Fetching Channels")
+        let promises: Promise<any>[] = [];
+        const channelId = currentChannel;
 
-            let dbchannels = await usersDb.getChannelsInUser((authContext.user as FirebaseUser).uid);
+        promises.push(getChannels());
+        promises.push(getUsers(channelId));
+        promises.push(getMessages(channelId));
 
-            setChannels(dbchannels);
+        Promise.all(promises).then(() => setIsLoaded(true));
 
-            loaderContext.setLoaderText("Fetching Messages...")
-
-            console.log("GETTING MESSAGES FOR CHANNEL ", channelId);
-
-
-            const dbmessages = await messagesDb.getMessages(channelId, 10);
-
-            setMessage(dbmessages);
-
-            loaderContext.setLoaderText("Fetching channel members...");
-
-            const dbusers = await channelsDb.getUsersInChannel(channelId);
-
-            const dbuserstate: any = {}
-            for (let i = 0; i < dbusers.length; i++) {
-                let idbuser = dbusers[i];
-                let idbuserId = idbuser.userId;
-                dbuserstate[idbuserId as string] = idbuser;
-            }
-            setUsers(dbuserstate);
-
-
-            // await wait(2000);
-            // loaderContext.setLoader(false);
-
-            console.log(">>?!?!?! set active channel", currentChannel)
-        })()
     }, [currentChannel])
 
 
     const receivedSetActiveChannel = useCallback(async (ev: any) => {
         if (!isCustomEvent(ev)) return;
         const data: DataTypes.Server.SET_ACTIVE_CHANNEL = ev.detail;
-        console.log(">!>!>!>!>!> RECEIVED ACTIVE CHANNEL", ev.detail)
         switchChannels(data[0].channelId);
 
     }, []);
@@ -337,7 +308,7 @@ function Chat() {
 
 
     const onChannelClick = (channelId: string) => {
-        console.log("A CHANNEL GOT CLICKED", channelId)
+        Logger.logc('lightgreen', "CHANNEL_CLICKED", channelId)
 
         if (currentChannel === channelId) return;
 
@@ -372,9 +343,7 @@ function Chat() {
                         <ChatHeaderBrand>Blitz App</ChatHeaderBrand>
                         <ChatHeaderLeft>
                             {currentChannel && <CopyLink channelId={currentChannel as string} />}
-                            {/* <LinkDiv>
-                                <IoIosLink />
-                            </LinkDiv> */}
+
                             <LogoutDiv onClick={() => signOut()}>
                                 <CiLogout />
                             </LogoutDiv>
@@ -387,9 +356,11 @@ function Chat() {
 
                             <ChannelsContainer>
                                 {channels.map((channel, index) => (
-                                    <ChannelDiv active={channel.channelId === currentChannel} onClick={() => onChannelClick(channel.channelId)} key={index}>
-                                        {channel.name}
-                                    </ChannelDiv>
+                                    <Tooltip title={'Click to switch channels'} placement="right">
+                                        <ChannelDiv active={channel.channelId === currentChannel} onClick={() => onChannelClick(channel.channelId)} key={index}>
+                                            {channel.name}
+                                        </ChannelDiv>
+                                    </Tooltip>
                                 ))}
                                 <ChannelDialog switchChannels={onChannelClick} />
                             </ChannelsContainer>
@@ -441,30 +412,35 @@ function Chat() {
                         </ChatMain>
                         <ChatSidebar width={22}>
 
-                            {currentChannel ? <UsersContainer >{
+                            <UsersContainer>{currentChannel ? <>{
                                 Object.values(users).map((user, index) => {
                                     return (
-                                        <User key={index} onClick={() => redirectToProfile(user.userId)}>
+                                        <Tooltip title={'View User Profile'} placement="left">
+                                            <User key={index} onClick={() => redirectToProfile(user.userId)}>
+                                                <UserAvatar
+                                                    crossOrigin="anonymous"
+                                                    referrerPolicy="no-referrer"
+                                                    src={user?.photoURL ?? `https://api.dicebear.com/7.x/pixel-art/svg?seed=${0}`} />
+                                                <UserDetail>{user.username}</UserDetail>
+                                            </User>
+                                        </Tooltip>
+                                    )
+                                })
+                            }</>
+                                :
+                                <>
+                                    <Tooltip title={'View User Profile'} placement="left">
+                                        <User onClick={() => redirectToProfile()}>
                                             <UserAvatar
                                                 crossOrigin="anonymous"
                                                 referrerPolicy="no-referrer"
-                                                src={user?.photoURL ?? `https://api.dicebear.com/7.x/pixel-art/svg?seed=${0}`} />
-                                            <UserDetail>{user.username}</UserDetail>
+                                                src={authContext.user?.photoURL ?? `https://api.dicebear.com/7.x/pixel-art/svg?seed=${0}`} />
+                                            <UserDetail>{authContext.user?.displayName}</UserDetail>
                                         </User>
-                                    )
-                                })
+                                    </Tooltip>
+                                </>
                             }</UsersContainer>
-                                :
-                                <UsersContainer>
-                                    <User onClick={() => redirectToProfile()}>
-                                        <UserAvatar
-                                            crossOrigin="anonymous"
-                                            referrerPolicy="no-referrer"
-                                            src={authContext.user?.photoURL ?? `https://api.dicebear.com/7.x/pixel-art/svg?seed=${0}`} />
-                                        <UserDetail>{authContext.user?.displayName}</UserDetail>
-                                    </User>
-                                </UsersContainer>
-                            }
+
                         </ChatSidebar>
                     </ChatContent>
                 </ChatContainer>

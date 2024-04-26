@@ -313,6 +313,7 @@ export const User = styled.div`
 
     :hover {
         background-color: ${({ theme }) => theme.lightbg};
+        cursor: pointer;
     }
 `;
 
@@ -377,9 +378,20 @@ export const NoChat = styled.div`
     /* background-color: red; */
 `;
 
+export const NoChatKeyframe = keyframes`
+    90% {
+        transform: rotate(350deg);
+    }
+`
+
 export const NoChatIcon = styled.div`
     font-size: 10rem;
     color: ${({ theme }) => theme.lightText};
+    transition: all 1s ease;
+
+    &:hover {
+        transform: scale(1.5);
+    }
 
 `;
 
