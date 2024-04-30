@@ -96,7 +96,10 @@ function Chat() {
 
         wsm.addEventListener(Message.types[Message.types.MESSAGE_CREATE], messageCreate);
 
-        return () => { console.log("removing message listener"); wsm.removeEventListener(Message.types[Message.types.MESSAGE_CREATE], messageCreate) };
+        return () => {
+            Logger.logc('lightgreen', 'REMOVE_EVENT_LISTENERS', "removing message listener");
+            wsm.removeEventListener(Message.types[Message.types.MESSAGE_CREATE], messageCreate)
+        };
     }, [message, setMessage]);
 
     useEffect(() => {
@@ -113,7 +116,11 @@ function Chat() {
 
         wsm.addEventListener(Message.types[Message.types.USER_JOIN], receivedUserJoin);
 
-        return () => { wsm.removeEventListener(Message.types[Message.types.USER_JOIN], receivedUserJoin) };
+        return () => { 
+            Logger.logc('lightgreen', 'REMOVE_EVENT_LISTENERS', "removing user join listener");
+        
+            wsm.removeEventListener(Message.types[Message.types.USER_JOIN], receivedUserJoin) 
+        };
 
 
     }, [users, setUsers])
@@ -222,7 +229,7 @@ function Chat() {
         setChannels([]);
 
 
-        Logger.log('lightgreen', 'REMOVE_EVENT_LISTENERS', 'flushing listeners');
+        Logger.logc('lightgreen', 'REMOVE_EVENT_LISTENERS', 'removing activeChannel and handshake listeners');
 
         wsm.removeEventListener('wsopen', handshake);
         wsm.removeEventListener(Message.types[Message.types.SET_ACTIVE_CHANNEL], receivedSetActiveChannel);
@@ -327,9 +334,6 @@ function Chat() {
     }
 
 
-    const copyChannelCodeToClipboard = () => {
-
-    }
 
 
 
@@ -356,7 +360,7 @@ function Chat() {
 
                             <ChannelsContainer>
                                 {channels.map((channel, index) => (
-                                    <Tooltip title={'Click to switch channels'} placement="right">
+                                    <Tooltip key={index} title={'Click to switch channels'} placement="right">
                                         <ChannelDiv active={channel.channelId === currentChannel} onClick={() => onChannelClick(channel.channelId)} key={index}>
                                             {channel.name}
                                         </ChannelDiv>

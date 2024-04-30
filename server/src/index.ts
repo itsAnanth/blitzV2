@@ -5,7 +5,7 @@ import { config } from "dotenv";
 import Logger from "./utils/Logger";
 import { push, set, ref, query, onValue, child, limitToFirst, get, orderByChild, equalTo } from "firebase/database";
 import { getMessageId } from "./utils";
-import { rdb } from "../../database";
+import { messagesDb, rdb } from "../../database";
 
 const httpServer = new HttpServer(3000);
 Logger.DEV = true;
@@ -40,8 +40,8 @@ declare module 'websocket' {
 }
 
 (async function() {
-    console.log("hello")
-    const reference = ref(rdb, `channels`);
+    
+    // console.log('testing db', await messagesDb.getMessagesInRange('-NwLAiV6bPrMHbVQrEKn', 5))
     // let data = null as any;
 
     // const snap = await get(query(reference, orderByChild('channelId'), equalTo("-NvMjN7SAzzsTneDPmMN")))

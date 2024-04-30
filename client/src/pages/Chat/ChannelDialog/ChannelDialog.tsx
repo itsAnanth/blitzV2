@@ -5,7 +5,7 @@ import Message, { DataTypes } from '../../../../../shared/Message';
 import { FireBaseContext } from '../../../contexts/firebase.context';
 import { WebSocketContext } from '../../../contexts/websocket.context';
 import { LoaderContext } from '../../../contexts/loader.context';
-import { isCustomEvent, wait } from '../../../utils';
+import { Logger, isCustomEvent, wait } from '../../../utils';
 import { channelsDb, usersDb } from '../../../../../database';
 import { User } from 'firebase/auth';
 
@@ -38,6 +38,8 @@ function ChannelDialog({ switchChannels }: { switchChannels: (channelId: string)
     };
 
     const handleClose = () => {
+        setError(false);
+        setErrorText('')
         setOpen(false);
     };
 
@@ -89,6 +91,7 @@ function ChannelDialog({ switchChannels }: { switchChannels: (channelId: string)
     }, [])
 
     const detachChannelEvents = useCallback(() => {
+        Logger.logc('lightgreen', 'REMOVE_EVENT_LISTENERS', 'removing join and create channel listeners')
         wsContext.removeEventListener(Message.types[Message.types.CREATE_CHANNEL], receivedCreateChannel)
 
 

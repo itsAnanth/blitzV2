@@ -387,7 +387,7 @@ export const NoChatKeyframe = keyframes`
 export const NoChatIcon = styled.div`
     font-size: 10rem;
     color: ${({ theme }) => theme.lightText};
-    transition: all 1s ease;
+    transition: all 0.5s ease;
 
     &:hover {
         transform: scale(1.5);
