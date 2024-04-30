@@ -1,0 +1,17 @@
+{
+    "rules": {
+        ".read": true,
+        ".write": true,
+        "messages": {
+            "$message": {
+                ".indexOn": "messageId"
+            }
+        },
+        "users": {
+            ".indexOn": "userId"
+        },
+        "channels": {
+            ".indexOn": "channelId"
+        }
+    }
+}
