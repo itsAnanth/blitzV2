@@ -1,5 +1,6 @@
 import { Database, get, limitToFirst, limitToLast, orderByChild, orderByKey, push, query, ref, set, startAt } from "firebase/database";
 import { DbMessage } from "./messages.schema";
+import { getDownloadURL, getStorage, uploadBytes, ref as storageRef } from "firebase/storage";
 
 
 
@@ -17,6 +18,7 @@ class MessagesDb {
         const listRef = push(reference)
 
     
+        message.messageId = listRef.key;
 
         await set(listRef, message);
 
@@ -48,6 +50,22 @@ class MessagesDb {
 
         return dataArray;
     }
+
+    async uploadMedia(file: File, channelId: string) {
+        const storage = getStorage();
+        
+        const fileRef = storageRef(storage, `media/${channelId}/${crypto.randomUUID()}.png`);
+        
+        
+
+
+        const snapshot = await uploadBytes(fileRef, file);
+        const url = await getDownloadURL(fileRef);
+
+
+        return url;
+    }
+
 }
 
 export default MessagesDb;

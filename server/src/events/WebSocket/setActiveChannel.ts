@@ -9,16 +9,17 @@ export default new WsEvent({
 
         const previousChannel = this.channels.get(user.activeChannel);
 
-        if (previousChannel)
-            previousChannel.users.splice(previousChannel.users.indexOf(userId));
+        // if (previousChannel)
+        //     previousChannel.users.splice(previousChannel.users.indexOf(userId));
 
         user.activeChannel = message.data[0].channelId;
 
         const currentChannel = this.channels.get(user.activeChannel);
 
-        currentChannel.users.push(userId)
+        // currentChannel.users.push(userId)
 
         console.log("SETTING ACTIVE CHANNEL", this.users.get(userId).activeChannel)
+        console.log('SETTING ACTIVE CHANNEL, MEMBERS ', currentChannel.users)
 
 
         ws.send(new Message({

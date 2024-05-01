@@ -16,7 +16,9 @@ export default new WsEvent<DataTypes.Client.CREATE_CHANNEL>({
         const serverChannel = new Channel({
             name: channelData.name,
             id: channelData.channelId
-        })
+        });
+
+        serverChannel.users.push(ws.id)
 
         this.channels.set(serverChannel.id, serverChannel);
 

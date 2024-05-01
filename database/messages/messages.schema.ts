@@ -4,6 +4,10 @@ type DbMessage = {
     timestamp: number;
     recipient: string;
     content: string;
+    attachemnt?: {
+        type: string,
+        url: string
+    }
 }
 
 export type { DbMessage }

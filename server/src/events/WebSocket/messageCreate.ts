@@ -22,7 +22,8 @@ export default new WsEvent<DataTypes.Client.MESSAGE_CREATE>({
             author: _message.data[0].author,
             timestamp: Date.now(),
             recipient: _message.data[0].recipient,
-            content: _message.data[0].content
+            content: _message.data[0].content,
+            attachemnt: _message.data[0].attachment ?? null
         }
 
 

@@ -54,6 +54,8 @@ function ChannelDialog({ switchChannels }: { switchChannels: (channelId: string)
 
         await usersDb.setUserChannel(authContext.user as User, data.channelId, 'add')
 
+        Logger.log('red', 'CREATE CHANNEL FUNCTION', authContext.user)
+
 
 
         switchChannels(data.channelId)

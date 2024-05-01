@@ -107,19 +107,16 @@ class WsServer extends server {
 
 
             
-            // channel.broadCast(this.users, new Message<DataTypes.Server.MESSAGE_CREATE>({
-            //     type: Message.types.MESSAGE_CREATE,
-            //     data: [{ content: `${user.username} has left the chat!`, recipient: '12345', author: 'bot', 'messageId': getMessageId(), timestamp: Date.now() }]
-            // }));
+
 
 
 
 
 
             if (user && user.activeChannel) {
-                const channel = this.channels.get(user.activeChannel);
+                // const channel = this.channels.get(user.activeChannel);
 
-                channel.users.splice(channel.users.indexOf(user.id), 1);
+                // channel.users.splice(channel.users.indexOf(user.id), 1);
 
                 Logger.log('[USER LEFT CHANNEL]', channel.id, channel.users.values())
             }

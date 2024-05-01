@@ -35,6 +35,8 @@ export default new WsEvent<DataTypes.Client.JOIN_CHANNEL>({
 
         await channelsDb.addUserToChannel(channelId, user.id)
 
+        channel.addUser(user.id)
+
         channel.broadCast(this.users, new Message<DataTypes.Server.MESSAGE_CREATE>({
             type: Message.types.MESSAGE_CREATE,
             data: [{ content: `${userData.username} has joined the chat!`, recipient: channelId, author: 'bot', 'messageId': getMessageId(), timestamp: Date.now()}]
@@ -49,6 +51,8 @@ export default new WsEvent<DataTypes.Client.JOIN_CHANNEL>({
             type: Message.types.JOIN_CHANNEL,
             data: [{ channelId: channelId }]
         }).encode());
+
+        console.log('JOIN CHANNEL, MEMBERS ', channel.users)
 
 
         // channel.broadCast(this.users, new Message<DataTypes.Server.JOIN_CHANNEL>({

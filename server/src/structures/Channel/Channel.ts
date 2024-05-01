@@ -41,12 +41,16 @@ class Channel {
 
     broadCast(users: WsServer['users'], message: Message, blacklist: string[] = []) {
         console.log("in room broadcast", [...users.entries()].map(x => x[0]));
+        console.log("in room broadcast, channel members", this.users);
+
         for (let i = 0; i < this.users.length; i++) {
             const user = users.get(this.users[i]);
 
             // console.log(user.id);
 
             if (!user) continue;
+
+            console.log('broadcast message to user ', user.id)
 
             if (blacklist.includes(user.id)) continue;
 
