@@ -1,6 +1,6 @@
 import { DbMessage, DbUser } from "../../../../database";
-import { ChatMessage as ChatMessageDiv, ChatMessageMetaWrapper, ChatMessageAvatar, MetaAuthor, MetaTimestamp, ChatMessageContent, ChatMessageMeta } from "../../pages/Chat/Chat.styled"
-import { Logger } from "../../utils";
+import { ChatMessage as ChatMessageDiv, ChatMessageMetaWrapper, ChatMessageAvatar, MetaAuthor, MetaTimestamp, ChatMessageContent, ChatMessageMeta, MediaPreviewAudio, MediaPreviewVideo } from "../../pages/Chat/Chat.styled"
+import { Logger, fileType } from "../../utils";
 import { ChatMessageImage } from "./ChatMessage.styled";
 
 function ChatMessage({ msg, user }: { msg: DbMessage, user: DbUser }) {
@@ -14,11 +14,17 @@ function ChatMessage({ msg, user }: { msg: DbMessage, user: DbUser }) {
         timestamp: Date.now()
     }
 
-    if (msg.attachemnt && msg.attachemnt.type.includes('image')) {
-        content = <ChatMessageImage src={msg.attachemnt.url}/>
-    } else {
+    
+    if (!msg.attachemnt || msg.attachemnt.type === null || msg.attachemnt.type === 'text')
         content = msg.content
-    }
+    else if (fileType(msg.attachemnt.type) === 'image') 
+        content = <ChatMessageImage src={msg.attachemnt.url}/>
+
+    else if (fileType(msg.attachemnt.type) === 'audio')
+        content = <MediaPreviewAudio controls={true} src={msg.attachemnt.url} />
+    else if (fileType(msg.attachemnt.type) === 'video')
+        content = <MediaPreviewVideo controls={true} width="320" height="240" src={msg.attachemnt.url} />
+
 
     // Logger.logc('blue', 'TEST', user as any)
 

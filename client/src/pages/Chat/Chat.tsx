@@ -1,10 +1,10 @@
-import { ChannelDiv, ChannelsContainer, ChatContainer, ChatContent, ChatDiv, ChatHeader, ChatHeaderBrand, ChatHeaderLeft, ChatMain, ChatMainContent, ChatMainForm, ChatMainFormSend, ChatMainFormUploadBtn, ChatSidebar, ChatSidebarContainer, ChatSidebarContent, LinkDiv, LogoutDiv, NoChat, NoChatContent, NoChatIcon, User, UserAvatar, UserDetail, UsersContainer } from "./Chat.styled";
+import { ChannelDiv, ChannelsContainer, ChatContainer, ChatContent, ChatDiv, ChatHeader, ChatHeaderBrand, ChatHeaderLeft, ChatMain, ChatMainContent, ChatMainForm, ChatMainFormSend, ChatMainFormUploadBtn, ChatSidebar, ChatSidebarContainer, ChatSidebarContent, LinkDiv, LogoutDiv, MediaPreviewAudio, MediaPreviewData, MediaPreviewDetail, MediaPreviewImage, MediaPreviewVideo, NoChat, NoChatContent, NoChatIcon, User, UserAvatar, UserDetail, UsersContainer } from "./Chat.styled";
 import { ChatMessage } from "../../components";
 import { AiOutlineSend } from 'react-icons/ai';
 import React, { useContext, useState, useEffect, useRef, useCallback } from "react";
 import { WebSocketContext } from "../../contexts/websocket.context";
 import Message, { DataTypes } from "../../../../shared/Message";
-import { Logger, isCustomEvent, wait } from "../../utils";
+import { Logger, fileType, isCustomEvent, wait } from "../../utils";
 import { useNavigate } from "react-router-dom";
 import { FireBaseContext } from "../../contexts/firebase.context";
 import { LoaderContext } from "../../contexts/loader.context";
@@ -43,7 +43,9 @@ function Chat() {
     const formContainerRef = useRef<HTMLDivElement>(null);
     const textRef = useRef<HTMLInputElement>(null);
     const chatMainRef = useRef<HTMLDivElement>(null);
-    const [mediaURL, setMediaURL] = useState<string | null>(null)
+    const [mediaURL, setMediaURL] = useState<string | null>(null);
+    const [fileReader, setFileReader] = useState<any>(null);
+    const [uploadingMedia, setUploadingMedia] = useState(false);
 
     type messageType = DataTypes.Server.MESSAGE_CREATE[0];
     type LoadingStatus = {
@@ -158,7 +160,7 @@ function Chat() {
         if (!isLoaded) {
             loaderContext.setLoader(true)
             Logger.logc('lightgreen', 'DEPENDENCIES DATA', 'RESOLVING', isLoaded)
-        
+
         } else {
             loaderContext.setLoader(false);
             Logger.logc('lightgreen', 'DEPENDENCIES DATA', 'RESOLVED', isLoaded)
@@ -393,18 +395,33 @@ function Chat() {
 
     const onFileChange = (ev: any) => {
         setFile(ev.target.files[0])
+        console.log("change file", (file != null && uploadingMedia))
     }
 
     const handleClose = () => {
         setOpen(false);
+        setFile(null)
+        setUploadingMedia(false);
+        setFileReader(null);
     }
 
     const handleOpen = () => {
         setOpen(true)
     }
 
+    const handleFileReader = async (file: Blob) => {
+        const reader = new FileReader();
+
+        const src = reader.readAsDataURL(file);
+
+        reader.onload = function (e) {
+            setFileReader(e.target?.result)
+        }
+    }
+
     const handleMedia = async (ev: any) => {
         ev.preventDefault()
+        setUploadingMedia(true);
 
         const formData = new FormData();
         // @ts-ignore
@@ -412,10 +429,11 @@ function Chat() {
 
         if (!file) return console.error("no file")
 
+
         if (!currentChannel) return console.error('no channel')
 
 
-        console.log(file)
+        console.log(file, uploadingMedia, file == null && !uploadingMedia)
 
         const url = await messagesDb.uploadMedia(file, currentChannel);
 
@@ -428,14 +446,50 @@ function Chat() {
     }
 
     useEffect(() => {
+        if (file != null)
+            handleFileReader(file);
+    }, [file])
+
+    useEffect(() => {
 
         if (mediaURL != null) {
             sendMessage('');
             handleClose();
-            setFile(null)
+
         }
 
     }, [mediaURL])
+
+    const formatBytes = (bytes: number, decimals = 2) => {
+        if (!+bytes) return '0 Bytes'
+
+        const k = 1024
+        const dm = decimals < 0 ? 0 : decimals
+        const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+
+        const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+        return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
+    }
+
+    const getPreview = () => {
+        let preview = <MediaPreviewImage />;
+
+        if (!file) {
+            console.error('preview loading failed');
+            return preview;
+        }
+
+        if (fileType(file.type) === 'image')
+            preview = <MediaPreviewImage src={fileReader} />
+        else if (fileType(file.type) === 'audio')
+            preview = <MediaPreviewAudio controls={true} src={fileReader} />
+        else if (fileType(file.type) === 'video')
+            preview = <MediaPreviewVideo controls={true} width="320" height="240" src={fileReader} />
+
+        return preview;
+
+    }
 
 
 
@@ -448,7 +502,10 @@ function Chat() {
             <React.Fragment>
 
                 <Dialog
+                    maxWidth={'md'}
                     open={open}
+
+                    fullWidth={true}
 
                     onClose={handleClose}
                     PaperProps={{
@@ -466,9 +523,33 @@ function Chat() {
                     <DialogContent >
                         <DialogContentText style={{
                             color: themeContext.lightText,
-                            marginBottom: '1.5rem'
-                        }}>Your Media file</DialogContentText>
-                        <Box width={'100%'} display={'flex'} justifyContent={'center'}>
+                            marginBottom: '1.5rem',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}>{(file != null && fileReader != null) ? "Selected Media File Preview" : "Select Your Media file"}</DialogContentText>
+                        {file != null && fileReader != null &&
+                            <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center' }}>
+                                {!uploadingMedia ? <>
+                                        {getPreview()}
+                                        <MediaPreviewDetail>
+                                            <MediaPreviewData>{`File Name: ${file.name}`}</MediaPreviewData>
+                                            <MediaPreviewData>{`File Type: ${file.type}`}</MediaPreviewData>
+                                            <MediaPreviewData>{`File size: ${formatBytes(file.size)}`}</MediaPreviewData>
+
+                                        </MediaPreviewDetail>
+                                    </> : <>
+                                        <MediaPreviewData>Uploading file...</MediaPreviewData>
+                                    </>}
+                            </Box>
+                        }
+
+                        <Box sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            m: 'auto',
+                            width: 'fit-content',
+                        }}>
 
                             <Button
                                 component="label"
@@ -476,8 +557,11 @@ function Chat() {
                                 variant="contained"
                                 tabIndex={-1}
                                 startIcon={<CloudUploadIcon />}
+                                sx={{
+                                    marginTop: '1rem'
+                                }}
                             >
-                                Upload file
+                                Select File
                                 <VisuallyHiddenInput type="file" onChange={onFileChange} />
                             </Button>
                         </Box>
@@ -487,8 +571,9 @@ function Chat() {
                     <DialogActions>
                         <Button onClick={handleClose}>Cancel</Button>
                         <Button
-                            disabled={file != null ? false : true}
-                            type="submit">Upload</Button>
+
+                            disabled={(file != null && uploadingMedia)}
+                            type="submit">Upload File</Button>
                     </DialogActions>
                 </Dialog>
             </React.Fragment>

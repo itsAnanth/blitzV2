@@ -401,3 +401,30 @@ export const NoChatContent = styled.div`
     font-size: 1.3rem;
     
 `
+
+export const MediaPreviewImage = styled.img`
+    height: 50%;
+    object-fit: cover;
+    width: auto;
+`
+
+export const MediaPreviewVideo = styled.video`
+
+`
+
+export const MediaPreviewAudio = styled.audio`
+
+`
+
+export const MediaPreviewDetail = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: column;
+`
+
+export const MediaPreviewData = styled.div`
+    color: ${({ theme }) => theme.text};
+    margin: 1rem 0.5rem;
+    margin-top: 1.5rem;
+`
