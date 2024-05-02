@@ -267,6 +267,7 @@ export const ChannelsContainer = styled.div`
 `
 
 export const ChannelDiv = styled.div<{ active?: boolean }>`
+    position: relative;
     /* margin: 1rem 1rem 0 0.5rem; */
     /* margin: 1rem 1rem 0 0.5rem; */
 

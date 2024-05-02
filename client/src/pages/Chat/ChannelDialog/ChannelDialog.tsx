@@ -177,11 +177,11 @@ function ChannelDialog({ switchChannels }: { switchChannels: (channelId: string)
 
         <>
             <ChannelDiv onClick={() => channelClick('join')}>
-                <CiCirclePlus style={{ fontSize: "1.5rem" }} />
+                <CiCirclePlus style={{ position: 'absolute', left: '10px', fontSize: "1.5rem" }} />
                 <div style={{ paddingLeft: "0.5rem" }}>Join Channel</div>
             </ChannelDiv>
             <ChannelDiv onClick={() => channelClick('create')}>
-                <CiCirclePlus style={{ fontSize: "1.5rem" }} />
+                <CiCirclePlus style={{ position: 'absolute', left: '10px', fontSize: "1.5rem" }} />
 
                 <div style={{ paddingLeft: "0.5rem" }}>Create Channel</div>
             </ChannelDiv>
@@ -242,35 +242,7 @@ function ChannelDialog({ switchChannels }: { switchChannels: (channelId: string)
                 </Dialog>
             </React.Fragment>
         </>
-        // <ChannelDialogContainer
-        //     show={channelDialog[0]}
-        // >
-        //     <IChannelDialog
-        //         show={channelDialog[0]}
-        //     >
-        //         <ChannelDialogHeading>
-        //             <ChannelDialogHeadingContent>{channelDialog[1] == 'create' ? "Channel Name" : "Join Channel"}</ChannelDialogHeadingContent>
-        //             <CloseBtn onClick={() => setChannelDialog([false, channelDialog[1]])}>close</CloseBtn>
-        //         </ChannelDialogHeading>
-        //         <Form onSubmit={onSubmit}>
-        //             <InputContainer>
-        //                 <InputHeading>{channelDialog[1] == 'create' ? "Channel Name" : "Invite Link/Code"}</InputHeading>
-        //                 <Input
-        //                     type="text"
-        //                     name="channelname"
-        //                     id="channelname"
-        //                     placeholder="Channel name"
-        //                     autoComplete='off'
-        //                     required
-        //                 />
-        //             </InputContainer>
-        //             <InputContainer justify='flex-end'>
-        //                 <SubmitButton type='submit'>{channelDialog[1] === 'create' ? 'Create' : 'Join'}</SubmitButton>
-        //             </InputContainer>
-        //         </Form>
 
-        //     </IChannelDialog>
-        // </ChannelDialogContainer>
     )
 }
 

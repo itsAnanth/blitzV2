@@ -35,6 +35,7 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 function Chat() {
+    const useLoader = true;
     const authContext = useContext(FireBaseContext);
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
@@ -157,7 +158,7 @@ function Chat() {
     }, [users, setUsers])
 
     useEffect(() => {
-        if (!isLoaded) {
+        if (!isLoaded && useLoader) {
             loaderContext.setLoader(true)
             Logger.logc('lightgreen', 'DEPENDENCIES DATA', 'RESOLVING', isLoaded)
 
@@ -295,7 +296,7 @@ function Chat() {
         Logger.logc('lightgreen', 'SWITCHING_CHANNELS', 'confirmed ws message, switching to', channelId);
         setIsLoaded(false)
         loaderContext.setLoaderText("Switching channels")
-        await wait(2000);
+        useLoader && await wait(2000);
         setCurrentChannel(channelId);
     }
 
@@ -362,6 +363,10 @@ function Chat() {
 
 
     }, [currentChannel])
+
+    useEffect(() => {
+        Logger.logc('red', 'DEBUG', 'channel changed', channels)
+    }, [channels])
 
 
     const receivedSetActiveChannel = useCallback(async (ev: any) => {
@@ -577,6 +582,7 @@ function Chat() {
                     </DialogActions>
                 </Dialog>
             </React.Fragment>
+
             <ChatDiv>
                 <ChatContainer>
                     <ChatHeader>
@@ -595,7 +601,7 @@ function Chat() {
                         <ChatSidebar width={18}>
 
                             <ChannelsContainer>
-                                {isLoaded && channels.map((channel, index) => (
+                                {channels.map((channel, index) => (
                                     <Tooltip key={index} title={'Click to switch channels'} placement="right">
                                         <ChannelDiv active={channel.channelId === currentChannel} onClick={() => onChannelClick(channel.channelId)} key={index}>
                                             {channel.name}
