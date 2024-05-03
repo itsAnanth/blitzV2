@@ -5,7 +5,7 @@ import { config } from "dotenv";
 import Logger from "./utils/Logger";
 import { push, set, ref, query, onValue, child, limitToFirst, get, orderByChild, equalTo } from "firebase/database";
 import { getMessageId } from "./utils";
-import { messagesDb, rdb } from "../../database";
+import { DbUser, messagesDb, rdb, usersDb } from "../../database";
 
 const httpServer = new HttpServer(3000);
 Logger.DEV = true;
@@ -87,5 +87,24 @@ declare module 'websocket' {
     wsServer.start();
 
     httpServer.setWsServer(wsServer);
+
+
+    const bot = await usersDb.getUser('bot');
+
+    if (!bot) {
+        Logger.log('[NO BOT USER]', 'setting bot user');
+
+        const bot: DbUser = {
+            userId: 'bot',
+            username: 'Blitz Bot',
+            photoURL: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${0}`,
+            channels: [],
+            timestamp: Date.now()
+        }
+
+        await usersDb.setDbUser(bot)
+
+        Logger.log('[SET BOT USER]', 'done')
+    }
 
 })();

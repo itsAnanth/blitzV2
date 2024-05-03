@@ -36,7 +36,9 @@ class ChannelsDb {
                 user = s.val();
             });
 
-            delete user.channels;
+            if (!user) continue;
+
+            if (user.channels) delete user?.channels;
 
             users.push(user);
         }

@@ -7,6 +7,8 @@ import { FireBaseContext } from '../../../contexts/firebase.context';
 import { ThemeContext } from 'styled-components';
 import AccountManager from '../../../structures/AccountManager';
 import { LoaderContext } from '../../../contexts/loader.context';
+import { usersDb } from '../../../../../database';
+import { User } from 'firebase/auth';
 
 
 export default function DeleteAccount() {
@@ -26,6 +28,7 @@ export default function DeleteAccount() {
     };
 
     const deleteAccount = async() => {
+        await usersDb.setUser(authContext.user as User, true);
         const user = await AccountManager.deleteUserAccount();
         if (user.error) {
             setError(true)

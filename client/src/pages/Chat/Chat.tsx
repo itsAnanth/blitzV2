@@ -324,11 +324,17 @@ function Chat() {
 
 
 
+        const bot = await usersDb.getUser('bot');
+
         const dbuserstate: any = {}
         for (let i = 0; i < dbusers.length; i++) {
             let idbuser = dbusers[i];
             let idbuserId = idbuser.userId;
             dbuserstate[idbuserId as string] = idbuser;
+        }
+
+        if (bot) {
+            dbuserstate[bot.userId] = bot;
         }
 
         Logger.logc('purple', "DB_CHANNELS", "getting users in channel", channelId, dbuserstate);
@@ -630,7 +636,7 @@ function Chat() {
 
                                 <>
                                     <ChatMainContent ref={chatMainRef}>
-                                        {isLoaded && message.map((item, i) => {
+                                        {true && message.map((item, i) => {
                                             // Logger.logc('cyan', 'iterator', item.messageId, item.author)
                                             return <ChatMessage
                                                 msg={item}

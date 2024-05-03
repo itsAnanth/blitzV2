@@ -7,7 +7,7 @@ function ChatMessage({ msg, user }: { msg: DbMessage, user: DbUser }) {
 
     let content;
     user = user ?? {
-        username: 'bot',
+        username: 'Deleted User',
         userId: '0',
         photoURL: 0,
         channels: [],

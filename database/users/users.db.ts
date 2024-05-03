@@ -14,7 +14,11 @@ class UsersDb {
 
     }
 
-    async setUser(user: User) {
+    async setDbUser(user: DbUser) {
+        await set(ref(this.rdb, `users/${user.userId}`), user);
+    }
+
+    async setUser(user: User, deleteUser: boolean = false) {
         const userData: DbUser = {
             userId: user.uid,
             channels: [],
@@ -25,7 +29,7 @@ class UsersDb {
 
 
 
-        await set(ref(this.rdb, `users/${user.uid}`), userData);
+        await set(ref(this.rdb, `users/${user.uid}`), deleteUser ? null : userData);
 
         // const listRef = ref(rdb, `users/${userid}`)
     }

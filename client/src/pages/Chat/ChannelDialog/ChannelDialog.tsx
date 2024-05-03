@@ -51,6 +51,7 @@ function ChannelDialog({ switchChannels }: { switchChannels: (channelId: string)
 
         const data: DataTypes.Server.CREATE_CHANNEL[0] = ev.detail[0];
 
+        if (!authContext.user) return Logger.logc('red', 'CREATE CHANNEL ERROR', 'authcontext user is null')
 
         await usersDb.setUserChannel(authContext.user as User, data.channelId, 'add')
 
@@ -77,6 +78,8 @@ function ChannelDialog({ switchChannels }: { switchChannels: (channelId: string)
 
         const data: DataTypes.Server.JOIN_CHANNEL[0] = ev.detail[0];
 
+
+        if (!authContext.user) return Logger.logc('red', 'JOIN CHANNEL ERROR', 'authcontext user is null')
 
         await usersDb.setUserChannel(authContext.user as User, data.channelId, 'add')
 

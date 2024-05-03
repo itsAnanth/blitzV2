@@ -2,6 +2,7 @@ import Message, { DataTypes } from "../../../../shared/Message";
 import { DbChannel, channelsDb } from '../../../../database';
 import WsEvent from "../../structures/Events/WsEvent";
 import Channel from "../../structures/Channel/Channel";
+import { getMessageId } from "../../utils";
 
 
 export default new WsEvent<DataTypes.Client.CREATE_CHANNEL>({
@@ -26,5 +27,17 @@ export default new WsEvent<DataTypes.Client.CREATE_CHANNEL>({
             type: Message.types.CREATE_CHANNEL,
             data: [channelData]
         }).encode())
+
+
+        serverChannel.broadCast(this.users, new Message<DataTypes.Server.MESSAGE_CREATE>({
+            type: Message.types.MESSAGE_CREATE,
+            data: [{
+                content: `Channel created`,
+                author: 'bot',
+                recipient: serverChannel.id,
+                timestamp: Date.now(),
+                messageId: getMessageId()
+            }]
+        }))
     },
 })
