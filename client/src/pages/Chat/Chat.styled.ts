@@ -170,22 +170,24 @@ export const MetaAuthor = styled.div`
     max-width: 50%;
     font-size: 1rem;
     margin-right: 1rem;
-    font-weight: 450;
-    color: ${({ theme }) => theme.text};
+    font-weight: 550;
+    color: ${({ theme }) => theme.lightText};
     
 `
 
 export const MetaTimestamp = styled.div`
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     line-height: 1rem;
     max-width: 20%;
+    font-weight: 450;
     color: ${({ theme }) => theme.lightText};
+    opacity: 0.8;
 
 `
 
 export const ChatMessageContent = styled.div`
     /* background-color: blue; */
-    color: ${({ theme }) => theme.text};
+    color: ${({ theme }) => theme.lightText};
     font-size: 0.9rem;
     padding: 1rem 0;
     padding-right: 1rem;
@@ -343,6 +345,19 @@ export const LogoutDiv = styled.div`
 
     :hover {
         transform: scale(1.2);
+        cursor: pointer;
+    }
+`
+
+export const ThemeDiv = styled.div`
+
+    color: ${({ theme }) => theme.text};
+    font-size: 2rem;
+    padding-right: 2rem;
+
+    :hover {
+        color: ${({ theme }) => theme.lightText};
+
         cursor: pointer;
     }
 `

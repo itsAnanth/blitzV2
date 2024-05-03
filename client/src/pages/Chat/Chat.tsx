@@ -1,4 +1,4 @@
-import { ChannelDiv, ChannelsContainer, ChatContainer, ChatContent, ChatDiv, ChatHeader, ChatHeaderBrand, ChatHeaderLeft, ChatMain, ChatMainContent, ChatMainForm, ChatMainFormSend, ChatMainFormUploadBtn, ChatSidebar, ChatSidebarContainer, ChatSidebarContent, LinkDiv, LogoutDiv, MediaPreviewAudio, MediaPreviewData, MediaPreviewDetail, MediaPreviewImage, MediaPreviewVideo, NoChat, NoChatContent, NoChatIcon, User, UserAvatar, UserDetail, UsersContainer } from "./Chat.styled";
+import { ChannelDiv, ChannelsContainer, ChatContainer, ChatContent, ChatDiv, ChatHeader, ChatHeaderBrand, ChatHeaderLeft, ChatMain, ChatMainContent, ChatMainForm, ChatMainFormSend, ChatMainFormUploadBtn, ChatSidebar, ChatSidebarContainer, ChatSidebarContent, LinkDiv, LogoutDiv, MediaPreviewAudio, MediaPreviewData, MediaPreviewDetail, MediaPreviewImage, MediaPreviewVideo, NoChat, NoChatContent, NoChatIcon, ThemeDiv, User, UserAvatar, UserDetail, UsersContainer } from "./Chat.styled";
 import { ChatMessage } from "../../components";
 import { AiOutlineSend } from 'react-icons/ai';
 import React, { useContext, useState, useEffect, useRef, useCallback } from "react";
@@ -14,13 +14,15 @@ import { IoIosLink } from "react-icons/io";
 import type { User as FirebaseUser } from "firebase/auth";
 import { DbChannel, DbMessage, DbUser, channelsDb, messagesDb, usersDb } from "../../../../database";
 import ChannelDialog from "./ChannelDialog/ChannelDialog";
-import { MdMessage } from "react-icons/md";
+import { MdDarkMode, MdLightMode, MdMessage } from "react-icons/md";
 import Profile from "../Profile/Profile";
 import CopyLink from "./CopyLink/CopyLink";
 import { Tooltip, Dialog, Button, Box, DialogContentText, DialogContent, DialogTitle, DialogActions } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { ThemeContext } from "styled-components";
+import { Theme, blueThemeLight, darkTheme } from "../../data/Theme";
+import { current } from "@reduxjs/toolkit";
 
 const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
@@ -496,6 +498,12 @@ function Chat() {
 
     }
 
+    const switchTheme = () => {
+        const item = localStorage.getItem('theme') ?? 'dark';
+        localStorage.setItem('theme', item == 'dark' ? 'light' : 'dark');
+        navigate(0)
+    }
+
 
 
 
@@ -588,6 +596,12 @@ function Chat() {
                     <ChatHeader>
                         <ChatHeaderBrand>Blitz App</ChatHeaderBrand>
                         <ChatHeaderLeft>
+                            <ThemeDiv onClick={switchTheme}>
+                                {(localStorage.getItem('theme') ?? 'dark') == 'dark' ? 
+                                <MdLightMode />  :
+                                <MdDarkMode />
+                            }
+                            </ThemeDiv>
                             {currentChannel && <CopyLink channelId={currentChannel as string} />}
 
                             <LogoutDiv onClick={() => signOut()}>

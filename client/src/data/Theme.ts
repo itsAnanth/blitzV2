@@ -16,16 +16,16 @@ type Theme = {
 
 export const blueThemeLight: Theme = {
     type: 'light',
-    primary: '#4e65fa',
+    primary: '#3246c2',
     secondary: '#667aff',
-    tertiary: '#7386ff',
-    bg: '#e6e9ff',
-    text: '#000000',
+    tertiary: '#5565d4',
+    bg: '#ccc',
+    text: 'white',
     bg50: '#e6e9ff50',
     tertiary50: '#7386ff50',
     secondary50: '#667aff50',
-    lightbg: '',
-    lightText: '#ccc'
+    lightbg: '#6c7be0',
+    lightText: '#1f1d1d'
 
 }
 
@@ -40,7 +40,7 @@ export const darkTheme: Theme = {
     secondary50: '',
     tertiary50: '',
     bg50: '',
-    lightText: '#ccc'
+    lightText: 'white'
 
 }
 

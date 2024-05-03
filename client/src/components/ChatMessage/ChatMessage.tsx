@@ -28,6 +28,30 @@ function ChatMessage({ msg, user }: { msg: DbMessage, user: DbUser }) {
 
     // Logger.logc('blue', 'TEST', user as any)
 
+
+
+    const getDisplayDate = (time: number) => {
+        let today = new Date();
+        let timestamp = new Date(time);
+
+        let timeFormat;
+
+
+        if (today.getDay() == timestamp.getDay()) {
+            let t = timestamp.toLocaleTimeString().split(':')
+            timeFormat = `Today at ${t[0]}:${t[1]} ${t[2].split(' ')[1]}`
+        } else if (today.getDay() == timestamp.getDay() + 1) {
+            let t = timestamp.toLocaleTimeString().split(':')
+            timeFormat = `Today at ${t[0]}:${t[1]} ${t[2].split(' ')[1]}`
+        } else {
+            let t = timestamp.toLocaleString().split(',');
+            timeFormat = t.join(' ');
+        }
+
+
+        return timeFormat;
+    }
+
     // console.log(msg)
     return (
 
@@ -40,12 +64,13 @@ function ChatMessage({ msg, user }: { msg: DbMessage, user: DbUser }) {
             <ChatMessageMetaWrapper>
                 <ChatMessageMeta>
                     <MetaAuthor>{user.username}</MetaAuthor>
-                    <MetaTimestamp>{msg.timestamp}</MetaTimestamp>
+                    <MetaTimestamp>{getDisplayDate(msg.timestamp)}</MetaTimestamp>
                 </ChatMessageMeta>
-                <ChatMessageContent>{content}</ChatMessageContent>
+                <ChatMessageContent onClick={() => msg.attachemnt?.url && window.open(msg.attachemnt.url)}>{content}</ChatMessageContent>
             </ChatMessageMetaWrapper>
         </ChatMessageDiv>
     )
 }
 
 export default ChatMessage;
+

@@ -1,6 +1,6 @@
 import { GlobalStyles } from './Global.styled';
 import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
-import { Chat, Landing, Profile, Test } from './pages';
+import { Chat, Home, Landing, Profile, Test } from './pages';
 import { ThemeProvider } from 'styled-components';
 import { blueThemeLight, darkTheme } from './data/Theme';
 import { LandingTypes } from './utils/LandingTypes';
@@ -9,24 +9,27 @@ import FireBaseProvider from './contexts/firebase.context';
 import LoaderProvider from './contexts/loader.context';
 import WebSocketProvider from './contexts/websocket.context';
 import AlertProvider from './contexts/alert.context';
+import { useState } from 'react';
 
 
 function App() {
 
 	// getAuth().setPersistence(browserLocalPersistence)
 
-	console.log(window.location.href);
 
 	Logger.DEV = true;
+
+	const item = localStorage.getItem('theme') ?? 'dark';
 
 	// wsm.connect()
 
 	return (
 		<>
-			<ThemeProvider theme={darkTheme}>
+			<WebSocketProvider>
+				<ThemeProvider theme={item == 'dark' ? darkTheme : blueThemeLight}>
 
 
-				<WebSocketProvider>
+
 					<FireBaseProvider>
 						<BrowserRouter>
 							<GlobalStyles />
@@ -39,13 +42,15 @@ function App() {
 										<Route path='/chat' element={<Chat />} />
 										<Route path='/test' element={<Test />} />
 										<Route path='/profile' element={<Profile />} />
+										<Route path='/home' element={<Home />} />
 									</Routes>
 								</AlertProvider>
 							</LoaderProvider>
 						</BrowserRouter>
 					</FireBaseProvider>
-				</WebSocketProvider>
-			</ThemeProvider>
+
+				</ThemeProvider>
+			</WebSocketProvider>
 		</>
 		// <>
 		// 	<GlobalStyles />
